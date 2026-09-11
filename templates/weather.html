@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./common.css">
+</head>
+<body data-image-theme="{{imageTheme}}" data-color-mode="{{colorMode}}">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="title">🌤️ {{title}}</div>
+        <div class="subtitle">{{subtitle}}</div>
+      </div>
+    </div>
+    <div class="weather-main">
+      <div class="weather-temp">{{temp}}</div>
+      <div class="weather-info">
+        {{info_html}}
+      </div>
+    </div>
+    {{sections_html}}
+    <div class="card-footer">{{footer}}</div>
+  </div>
+</body>
+</html>

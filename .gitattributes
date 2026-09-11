@@ -1,5 +1,9 @@
 * text eol=lf
 
+# 让所有 Markdown（包括 README）参与 GitHub Linguist 语言统计。
+*.[mM][dD] linguist-detectable=true
+*.[mM][aA][rR][kK][dD][oO][wW][nN] linguist-detectable=true
+
 *.png -text
 *.jpg -text
 *.ico -text

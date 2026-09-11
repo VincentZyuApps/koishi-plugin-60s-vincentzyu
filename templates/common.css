@@ -1,0 +1,235 @@
+/* ============================================================
+ * 60s 卡片通用样式
+ * 双主题：koishi（紫灰） / github（黑白灰）
+ * 通过 data-image-theme 与 data-color-mode 组合切换。
+ * ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body[data-image-theme='koishi'] {
+  --bg-start: #f0f0f2;
+  --bg-end: #e3e3e5;
+  --card-bg: #ffffff;
+  --card-text: #303036;
+  --card-muted: #767680;
+  --card-border: #e3e3e5;
+  --accent: #409eff;
+  --accent-soft: #ecf5ff;
+  --top1: #f59e0b;
+  --top2: #94a3b8;
+  --top3: #b45309;
+}
+
+body[data-image-theme='github'] {
+  --bg-start: #f6f8fa;
+  --bg-end: #eaeef2;
+  --card-bg: #ffffff;
+  --card-text: #1f2328;
+  --card-muted: #59636e;
+  --card-border: #d0d7de;
+  --accent: #0969da;
+  --accent-soft: #ddf4ff;
+  --top1: #f59e0b;
+  --top2: #6e7781;
+  --top3: #a34100;
+}
+
+body[data-image-theme='koishi'][data-color-mode='dark'] {
+  --bg-start: #000000;
+  --bg-end: #1e1e20;
+  --card-bg: #1e1e20;
+  --card-text: #f0f0f2;
+  --card-muted: #a7a7b0;
+  --card-border: #313136;
+  --accent: #7459ff;
+  --accent-soft: #302c50;
+  --top1: #f2cc60;
+  --top2: #b6bcc6;
+  --top3: #d2995d;
+}
+
+body[data-image-theme='github'][data-color-mode='dark'] {
+  --bg-start: #0d1117;
+  --bg-end: #161b22;
+  --card-bg: #161b22;
+  --card-text: #e6edf3;
+  --card-muted: #8b949e;
+  --card-border: #30363d;
+  --accent: #58a6ff;
+  --accent-soft: #0d2847;
+  --top1: #e3b341;
+  --top2: #8b949e;
+  --top3: #d29922;
+}
+
+@media (prefers-color-scheme: dark) {
+  body[data-image-theme='koishi'][data-color-mode='system'] {
+    --bg-start: #000000;
+    --bg-end: #1e1e20;
+    --card-bg: #1e1e20;
+    --card-text: #f0f0f2;
+    --card-muted: #a7a7b0;
+    --card-border: #313136;
+    --accent: #7459ff;
+    --accent-soft: #302c50;
+    --top1: #f2cc60;
+    --top2: #b6bcc6;
+    --top3: #d2995d;
+  }
+
+  body[data-image-theme='github'][data-color-mode='system'] {
+    --bg-start: #0d1117;
+    --bg-end: #161b22;
+    --card-bg: #161b22;
+    --card-text: #e6edf3;
+    --card-muted: #8b949e;
+    --card-border: #30363d;
+    --accent: #58a6ff;
+    --accent-soft: #0d2847;
+    --top1: #e3b341;
+    --top2: #8b949e;
+    --top3: #d29922;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Microsoft YaHei', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  padding: 24px;
+  width: 760px;
+  color: #fff;
+}
+
+/* 卡片主体 */
+.card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px 28px;
+  color: var(--card-text);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* 头部 */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--card-border);
+}
+
+.card-header .title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.3;
+}
+
+.card-header .subtitle {
+  font-size: 13px;
+  color: var(--card-muted);
+  margin-top: 3px;
+}
+
+/* 通用列表 */
+.list-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  border-bottom: 1px dashed var(--card-border);
+}
+
+.list-line:last-child {
+  border-bottom: none;
+}
+
+.list-rank {
+  flex-shrink: 0;
+  width: 26px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--card-muted);
+}
+
+.list-rank.top1 {
+  color: var(--top1);
+}
+
+.list-rank.top2 {
+  color: var(--top2);
+}
+
+.list-rank.top3 {
+  color: var(--top3);
+}
+
+.list-text {
+  flex: 1;
+}
+
+.list-hot {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--card-muted);
+}
+
+/* 单条内容 */
+.single-body {
+  padding: 20px 8px;
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--card-text);
+  word-break: break-word;
+}
+
+/* 天气专用 */
+.weather-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 8px 20px;
+  border-bottom: 2px solid var(--card-border);
+}
+
+.weather-temp {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.weather-info {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.weather-section {
+  margin-top: 16px;
+}
+
+.weather-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--card-muted);
+  margin-bottom: 8px;
+}
+
+/* 底部 */
+.card-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-border);
+  font-size: 12px;
+  color: var(--card-muted);
+  text-align: right;
+}

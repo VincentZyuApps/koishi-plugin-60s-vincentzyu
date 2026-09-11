@@ -1,22 +1,51 @@
 {
   "name": "koishi-plugin-60s-vincentzyu",
-  "description": "对接60sapi捏。",
-  "version": "0.0.1",
+  "description": "📰 对接 60s 开放 API（https://github.com/vikiboss/60s），提供早报、热榜、天气与实用工具。🛠️",
+  "version": "0.1.1-beta.2+20260911",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "templates"
   ],
-  "license": "MIT",
-  "scripts": {},
+  "homepage": "https://github.com/vikiboss/60s",
   "keywords": [
     "chatbot",
     "koishi",
-    "plugin"
+    "plugin",
+    "60s"
   ],
-  "devDependencies": {},
+  "scripts": {
+    "test": "vitest run",
+    "test:live-output": "node -r esbuild-register scripts/live-output.ts"
+  },
   "peerDependencies": {
     "koishi": "^4.18.7"
+  },
+  "peerDependenciesMeta": {
+    "koishi-plugin-puppeteer": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "puppeteer-core": "22.6.1",
+    "vitest": "^3.2.4"
+  },
+  "koishi": {
+    "description": {
+      "en": "60s open API plugin for news, hot searches, weather, utilities, and more.",
+      "zh": "60s 开放 API 插件，提供早报、热榜、天气、实用工具等常用功能。"
+    },
+    "service": {
+      "required": [
+        "http"
+      ],
+      "optional": [
+        "puppeteer"
+      ]
+    }
+  },
+  "dependencies": {
+    "@chinese-fonts/lxgwwenkai": "^3.0.0"
   }
 }

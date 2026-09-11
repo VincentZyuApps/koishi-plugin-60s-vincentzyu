@@ -16,3 +16,7 @@ tsconfig.tsbuildinfo
 *.ntvs*
 *.njsproj
 *.sln
+
+tmp
+temp
+output/
