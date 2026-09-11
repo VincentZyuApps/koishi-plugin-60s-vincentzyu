@@ -3,7 +3,7 @@ import { buildCardHtml, buildListItems, fillTemplate, loadCommonCss, loadTemplat
 
 describe('render/template-loader', () => {
   it('loads all template files', () => {
-    for (const name of ['daily', 'hot', 'weather', 'simple']) {
+    for (const name of ['daily', 'hot', 'weather', 'simple', 'media']) {
       const html = loadTemplate(name)
       expect(html).toContain('<html')
       expect(html).toContain('{{title}}')
@@ -82,5 +82,13 @@ describe('render/template-loader', () => {
     }, { imageTheme: 'koishi', colorMode: 'system' })
     expect(html).toContain('single-body')
     expect(html).toContain('今夕何夕')
+  })
+
+  it('builds media card', () => {
+    const html = buildCardHtml('media', {
+      title: '二维码', subtitle: '扫描使用', mediaUrl: 'https://example.test/code.png', mediaShape: 'square', footer: '60s API',
+    }, { imageTheme: 'github', colorMode: 'light' })
+    expect(html).toContain('media-image square')
+    expect(html).toContain('https://example.test/code.png')
   })
 })

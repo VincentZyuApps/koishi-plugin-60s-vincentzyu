@@ -1,6 +1,7 @@
 import type { Context, Session } from 'koishi'
 import type { Config } from '../config'
 import type { Client } from '../client'
+import type { CommandOutputId } from '../render/output'
 import { addModeOption, cardPayload, safeAction, sendReply, withMode } from './helper'
 import { formatWeibo, formatBili, formatDouyin, formatZhihu, formatGenericHot, formatHackerNews } from '../utils/format'
 
@@ -32,6 +33,12 @@ const SOURCE_TITLES: Record<HotSource, string> = {
   dongchedi: '懂车帝热榜',
   hn: 'Hacker News',
   'it-rank': 'IT之家热榜',
+}
+
+const SOURCE_OUTPUT_IDS: Record<HotSource, CommandOutputId> = {
+  weibo: 'hot-weibo', bili: 'hot-bili', douyin: 'hot-douyin', zhihu: 'hot-zhihu',
+  toutiao: 'hot-toutiao', baidu: 'hot-baidu', quark: 'hot-quark', rednote: 'hot-rednote',
+  dongchedi: 'hot-dongchedi', hn: 'hot-hn', 'it-rank': 'hot-it-rank',
 }
 
 export async function registerHotCommands(ctx: Context, config: Config, client: Client) {
@@ -142,6 +149,6 @@ async function sendHot(ctx: Context, session: Session, client: Client, config: C
     subtitle: '实时热搜',
     items,
     footer: '60s API',
-  }, 'hot', 'list'), options)
+  }, 'hot', 'list'), options, SOURCE_OUTPUT_IDS[source])
   await sendReply(ctx, session, client, config, { ...payload, text })
 }

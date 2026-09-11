@@ -1,7 +1,7 @@
 import type { Context } from 'koishi'
 import type { Config } from '../config'
 import type { Daily60s } from '../types'
-import { buildCardHtml, buildListItems, type CardBuildOptions } from './template-loader'
+import { buildCardHtml, buildListItems, escapeHtml, type CardBuildOptions } from './template-loader'
 import type { CardData, CardTemplate } from './dispatch'
 import { resolveCardFontCss } from '../utils/font'
 import { getDailyNewsTitle } from '../utils/format'
@@ -15,6 +15,7 @@ function getCardFontText(data: CardData) {
     data.body,
     data.temp,
     data.footer,
+    data.mediaUrl,
     ...(data.items || []).map((item) => item.text),
     ...(data.infoLines || []),
     ...(data.sections || []).flatMap((section) => [section.title, ...section.lines]),
@@ -58,6 +59,16 @@ export function renderCardToHtml(data: CardData, config: Config, template: CardT
         ? data.sections.map((s) => `<div class="weather-section"><div class="weather-section-title">${s.title}</div>${s.lines.map((l) => `<div>${l}</div>`).join('')}</div>`).join('')
         : '',
       footer: data.footer ?? '',
+    }, options)
+  }
+
+  if (template === 'media') {
+    return buildCardHtml('media', {
+      title: escapeHtml(data.title),
+      subtitle: escapeHtml(data.subtitle ?? ''),
+      mediaUrl: escapeHtml(data.mediaUrl ?? ''),
+      mediaShape: data.mediaShape ?? 'cover',
+      footer: escapeHtml(data.footer ?? ''),
     }, options)
   }
 

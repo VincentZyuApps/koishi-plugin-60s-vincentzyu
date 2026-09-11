@@ -2,17 +2,18 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-60s-vincentzyu?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-60s-vincentzyu)
 
-对接 [60s](https://github.com/vikiboss/60s) 开放 API 的 Koishi 插件喵。它提供每日早报、热榜、天气、汇率、娱乐资讯和常用小工具，并支持纯文本、Puppeteer 卡片图与 QQ 官方 Bot Markdown 渲染喵。
+对接 [60s](https://github.com/vikiboss/60s) 开放 API 的 Koishi 插件。它提供每日早报、热榜、天气、汇率、娱乐资讯和常用小工具，并支持纯文本、Puppeteer 卡片图与 QQ 官方 Bot Markdown 输出。
 
 ## 安装
 
-在 Koishi 插件市场搜索 `60s-vincentzyu`，或在工作区中安装：
+在 Koishi 插件市场搜索 `60s-vincentzyu`，或在 Koishi 根目录执行：
 
 ```bash
 yarn add koishi-plugin-60s-vincentzyu
+npm install koishi-plugin-60s-vincentzyu
 ```
 
-插件需要 Koishi 的 `http` 服务喵。若要生成卡片图，请同时安装并启用 `koishi-plugin-puppeteer` 喵。
+插件需要 Koishi 的 `http` 服务。若要生成卡片图，请同时安装并启用 `koishi-plugin-puppeteer`。
 
 ## 基础配置
 
@@ -28,21 +29,36 @@ yarn add koishi-plugin-60s-vincentzyu
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `renderModePriority` | `RenderPriorityEntry[]` | `general-auto` | 渲染优先级表，表格从上到下依次尝试，重复项只取首次出现的位置 |
-| `renderModePriority[].mode` | `qq-auto` / `general-auto` / `text` / `image` / `qq-markdown` | `general-auto` | `qq-auto` 为 QQ 官方 Bot 优先 Markdown；`general-auto` 为列表优先图片、单条文本；`text` 始终文本；`image` 强制图片；`qq-markdown` 仅 QQ 官方 Bot |
-| `renderModePriority[].enabled` | `boolean` | `true` | 是否参与优先级选择 |
+| `renderPreset` | `general` / `qq-official` / `custom` | `general` | 全局输出预设；通用、QQ 官方 Bot 或逐命令严格自定义 |
+| `customCommandOutput.<命令>` | `text` / `card` / `image` / `qq-markdown` | 按命令类型 | 仅 `custom` 生效；每条规范命令以控制台单选项配置，格式不可用时严格报错 |
 | `enableQuote` | `boolean` | `true` | 是否引用触发命令的消息 |
 | `enableWaitingHint` | `boolean` | `true` | 是否发送并自动撤回“获取中”提示 |
 
-每条指令都可附加 `-m image`、`-m text` 等方式临时优先尝试某种渲染模式；该方式不可用时会继续按配置表回退喵。
+每条指令都可附加 `-m text|card|image|qq-markdown` 临时优先尝试一种输出；不可用时回到当前预设。
+
+## 输出预设
+
+`general` 是默认预设：列表优先 Puppeteer 卡片图，单条内容优先文本，天然图片直接发送。卡片图不可用时会回退文本；早报有官方图时优先使用该图回退。
+
+`qq-official` 仅对 QQ 官方 Bot 生效：列表优先 QQ 原生 Markdown，无法发送时按 `general` 处理；其他平台始终按 `general` 处理。
+
+`custom` 使用“自定义指令输出”中的逐命令单选。所选输出不可用时不会降级，而会向会话返回简洁错误并在控制台记录详细原因。
+
+| 内容类型 | 默认输出 | 指令 |
+| --- | --- | --- |
+| 列表 / 数据汇总 | Puppeteer 卡片图 | `早报`、`历史`、`热榜`、`天气`、`汇率`、`油价`、`金价`、`摸鱼`、`IT`、`AI`、`黑客新闻`、`歌词`、`IP`、`密码`、`密码校验`、`健康`、`猫眼`、`酷安` |
+| 单条内容 | 纯文本 | `一言`、`段子`、`笑话`、`发病`、`答案`、`运势`、`百科`、`翻译` |
+| 原始图片 | 直接发送图片 | `早报 -i`（官方早报图）、`二维码`、`QQ`（有头像时） |
+| 早报的无截图回退 | 直接发送官方早报图 | `早报`：有官方图且 Puppeteer 不可用时；官方图也不可用才回退文本 |
+
+可通过 `-m text` 临时读取列表文本，或用 `-m card` 让单条内容优先尝试截图卡片。二维码和 QQ 资料在自定义模式可选直接图片、嵌图卡片或文本提示。
 
 ### 🤖 QQ 官方 Bot Markdown
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `enableQQMarkdown` | `boolean` | `false` | 是否启用 QQ 官方 Bot 原生 Markdown |
 | `qqMarkdownKeyboardJson` | `string` | 内置“再来一次 / 帮助”键盘 JSON | QQ Markdown 按钮配置，支持 `${command}` 变量 |
-| `qqMarkdownButtonMode` | `string[]` | `['append-qq-markdown']` | 按钮发送位置：`standalone`、`append-qq-markdown`、`append-puppeteer-image`，可多选 |
+| `qqMarkdownButtonMode` | `none` / `standalone` / `append-to-markdown` | `append-to-markdown` | 不发按钮、单独发按钮或附在 QQ Markdown 中 |
 
 ### 🖼️ Puppeteer 卡片图
 
@@ -56,7 +72,7 @@ yarn add koishi-plugin-60s-vincentzyu
 | `fontMode` | `npm-lxgw` / `release-lxgw` / `custom-path` / `system-default` | `npm-lxgw` | 所有 Puppeteer 卡片的字体来源 |
 | `customFontPath` | `string` | `''` | 选择 `custom-path` 时使用的字体绝对路径，支持 TTF / OTF / WOFF / WOFF2 |
 
-`npm-lxgw` 使用插件随附的霞鹜文楷且不联网喵。`release-lxgw` 会在首次使用时从 Gitee / GitHub Release 下载等宽版到 Koishi 根目录 `data/fonts` 喵。所选字体不可用时截图会报错，不会静默改用其他字体喵。
+`npm-lxgw` 使用插件随附的霞鹜文楷且不联网。`release-lxgw` 会在首次使用时从 Gitee / GitHub Release 下载等宽版到 Koishi 根目录 `data/fonts`。所选字体不可用时截图会报错，不会静默改用其他字体。
 
 ### 🔍 调试
 
@@ -79,8 +95,8 @@ yarn add koishi-plugin-60s-vincentzyu
 60s.密码 16 -s      生成含符号密码
 ```
 
-更多参数可使用 `60s.xxx --help` 查看喵。
+更多参数可使用 `60s.xxx --help` 查看。
 
 ## 测试
 
-测试命令、真实 API 冒烟和全指令文本/截图验收说明见 [test/README.md](./test/README.md) 喵。真实验收会写入被 Git 忽略的 `output/runs/`，每轮都有可直接查看的文本、图片与 Markdown 报告喵。
+测试命令、真实 API 冒烟和全指令文本/截图验收说明见 [test/README.md](./test/README.md)。真实验收会写入被 Git 忽略的 `output/runs/`，每轮都有可直接查看的文本、图片与 Markdown 报告。

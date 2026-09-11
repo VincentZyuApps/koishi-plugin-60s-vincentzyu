@@ -1,98 +1,47 @@
 import { describe, expect, it } from 'vitest'
 import { parseModeOption } from '../../src/commands/helper'
-import { renderReply, sendReply } from '../../src/render/dispatch'
+import { OutputUnavailableError, renderReply, sendReply } from '../../src/render/dispatch'
+import { DEFAULT_CUSTOM_COMMAND_OUTPUT } from '../../src/render/output'
 import { makeConfig, makeSession } from '../helpers/setup'
 
 describe('render/dispatch', () => {
   const cardData = { title: '测试卡片', body: '卡片正文' }
 
-  it('uses general-auto behavior for qq-auto outside QQ official bots', async () => {
-    const result = await renderReply(
-      {} as any,
-      makeSession({ platform: 'onebot' }),
-      {} as any,
-      makeConfig({ renderModePriority: [{ mode: 'qq-auto', enabled: true }] }),
-      { text: '文本兜底', cardData, kind: 'list' },
-    )
-
-    // general-auto maps lists to image; the unavailable card renderer then hard-skips to text.
+  it('通用预设在卡片不可用时回退为文本', async () => {
+    const result = await renderReply({ logger: { warn() {} } } as any, makeSession(), {} as any, makeConfig(), { text: '文本兜底', cardData, kind: 'list' })
     expect(result.mode).toBe('text')
     expect(result.elements).toContain('文本兜底')
   })
 
-  it('uses QQ Markdown for qq-auto lists on QQ official bots', async () => {
+  it('QQ 官方预设优先发送原生 Markdown', async () => {
     const session = makeSession({ platform: 'qq' })
-    const result = await renderReply(
-      {} as any,
-      session,
-      {} as any,
-      makeConfig({ enableQQMarkdown: true, renderModePriority: [{ mode: 'qq-auto', enabled: true }] }),
-      { text: '热榜文本', markdown: '# 热榜', kind: 'list' },
-      '60s.热榜',
-    )
-
+    const result = await renderReply({ logger: { warn() {} } } as any, session, {} as any, makeConfig({ renderPreset: 'qq-official' }), { text: '热榜文本', markdown: '# 热榜', kind: 'list' }, '60s.热榜')
     expect(result.mode).toBe('qq-markdown')
     expect(session.bot.internal.sendMessage).toHaveBeenCalled()
   })
 
-  it('uses image output for general-auto lists when an image URL is available', async () => {
-    const result = await renderReply(
-      {} as any,
-      makeSession(),
-      {} as any,
-      makeConfig({ renderModePriority: [{ mode: 'general-auto', enabled: true }] }),
-      { text: '热榜文本', imageUrl: 'https://example.test/card.png', kind: 'list' },
-    )
-
-    expect(result.mode).toBe('image')
-    expect(result.elements).toContain('https://example.test/card.png')
+  it('自定义预设严格拒绝不可用的输出', async () => {
+    const customCommandOutput = { ...DEFAULT_CUSTOM_COMMAND_OUTPUT, daily: 'image' as const }
+    await expect(renderReply({ logger: { error() {}, warn() {} } } as any, makeSession(), {} as any, makeConfig({ renderPreset: 'custom', customCommandOutput }), { text: '早报', kind: 'list', commandId: 'daily' })).rejects.toBeInstanceOf(OutputUnavailableError)
   })
 
-  it('hard-skips unavailable card images and reaches the text fallback', async () => {
-    const result = await renderReply(
-      {} as any,
-      makeSession(),
-      {} as any,
-      makeConfig({ renderModePriority: [{ mode: 'image', enabled: true }] }),
-      { text: '文本兜底', cardData, kind: 'list' },
-    )
-
-    expect(result.mode).toBe('text')
-    expect(result.elements).toContain('文本兜底')
-  })
-
-  it('tries an unavailable mode override before the configured fallback', async () => {
-    const result = await renderReply(
-      {} as any,
-      makeSession(),
-      {} as any,
-      makeConfig({ renderModePriority: [{ mode: 'text', enabled: true }] }),
-      { text: '文本兜底', cardData, kind: 'list', modeOverride: 'image' },
-    )
-
+  it('临时模式不可用后继续使用预设规则', async () => {
+    const result = await renderReply({ logger: { warn() {} } } as any, makeSession(), {} as any, makeConfig(), { text: '文本兜底', cardData, kind: 'single', modeOverride: 'image' })
     expect(result.mode).toBe('text')
   })
 
-  it('accepts the new mode options and rejects the removed auto option', () => {
-    expect(parseModeOption('qq-auto')).toBe('qq-auto')
-    expect(parseModeOption('general-auto')).toBe('general-auto')
-    expect(parseModeOption('auto')).toBeUndefined()
+  it('只接受四种最终输出模式', () => {
+    expect(parseModeOption('card')).toBe('card')
+    expect(parseModeOption('qq-markdown')).toBe('qq-markdown')
+    expect(parseModeOption('qq-auto')).toBeUndefined()
+    expect(parseModeOption('general-auto')).toBeUndefined()
   })
 
-  it('applies enableQuote to the waiting hint and the final reply', async () => {
+  it('等待提示与最终回复都应用引用设置', async () => {
     const session = makeSession()
-    await sendReply(
-      {} as any,
-      session,
-      {} as any,
-      makeConfig({ enableQuote: true, enableWaitingHint: true, renderModePriority: [{ mode: 'text', enabled: true }] }),
-      { text: '早报内容' },
-    )
-
+    await sendReply({ logger: { warn() {} } } as any, session, {} as any, makeConfig({ enableQuote: true, enableWaitingHint: true }), { text: '早报内容' })
     expect(session.send).toHaveBeenCalledTimes(2)
     expect(session.send.mock.calls[0][0]).toContain('<quote id="msg-1">')
-    expect(session.send.mock.calls[0][0]).toContain('⏳ 获取中，请稍候…')
-    expect(session.send.mock.calls[1][0]).toContain('<quote id="msg-1">')
     expect(session.send.mock.calls[1][0]).toContain('早报内容')
     expect(session.bot.deleteMessage).toHaveBeenCalledWith('456', 'mock-msg-id')
   })

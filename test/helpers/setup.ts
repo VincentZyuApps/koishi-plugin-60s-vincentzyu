@@ -1,4 +1,5 @@
 import { vi } from 'vitest'
+import { DEFAULT_CUSTOM_COMMAND_OUTPUT } from '../../src/render/output'
 
 /** 构造一个最小可用的 Session mock */
 export function makeSession(overrides: any = {}) {
@@ -55,12 +56,12 @@ export function makeConfig(overrides: any = {}) {
     baseUrl: 'http://127.0.0.1:4399',
     timeout: 15000,
     commandPrefix: '60s',
-    renderModePriority: [{ mode: 'general-auto', enabled: true }],
+    renderPreset: 'general',
+    customCommandOutput: { ...DEFAULT_CUSTOM_COMMAND_OUTPUT },
     enableQuote: false,
     enableWaitingHint: false,
-    enableQQMarkdown: false,
     qqMarkdownKeyboardJson: '{}',
-    qqMarkdownButtonMode: ['append-qq-markdown'],
+    qqMarkdownButtonMode: 'append-to-markdown',
     imageType: 'png',
     screenshotQuality: 88,
     imageWidth: 760,

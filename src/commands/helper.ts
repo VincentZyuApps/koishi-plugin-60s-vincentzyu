@@ -1,5 +1,7 @@
 import type { Context, Session } from 'koishi'
-import type { Config, RenderMode } from '../config'
+import { h } from 'koishi'
+import type { Config } from '../config'
+import { OUTPUT_MODE, type CommandOutputId, type OutputMode } from '../render/output'
 import type { Client } from '../client'
 import { sendReply, type CardData, type CardTemplate, type RenderPayload } from '../render/dispatch'
 export interface CommandCtx {
@@ -75,7 +77,8 @@ export async function safeAction(
 
     // session 输出给用户（404 已在 client 层生成友好文案，直接展示）
     try {
-      await session.send(`❌ ${hint}`)
+      const quote = config?.enableQuote ? h.quote(session.messageId) : ''
+      await session.send(`${quote}${h.text(`❌ ${hint}`)}`)
     } catch {
       // 发送失败就静默，避免二次异常
     }
@@ -102,24 +105,24 @@ export function cardPayload(data: CardData, template: CardTemplate, kind: Render
 }
 
 /** 从 --mode 选项值解析渲染模式，非法值返回 undefined（走默认） */
-export function parseModeOption(value: string | undefined): RenderMode | undefined {
+export function parseModeOption(value: string | undefined): OutputMode | undefined {
   if (!value) return undefined
   const v = value.trim().toLowerCase()
-  if (v === 'qq-auto' || v === 'general-auto' || v === 'text' || v === 'image' || v === 'qq-markdown') {
-    return v as RenderMode
+  if (v === OUTPUT_MODE.TEXT || v === OUTPUT_MODE.CARD || v === OUTPUT_MODE.IMAGE || v === OUTPUT_MODE.QQ_MARKDOWN) {
+    return v as OutputMode
   }
   return undefined
 }
 
 /** 给命令链追加统一的 --mode option */
 export function addModeOption(command: any): any {
-  return command.option('mode', '-m, --mode <qq-auto|general-auto|text|image|qq-markdown> 临时优先尝试渲染方式')
+  return command.option('mode', '-m, --mode <text|card|image|qq-markdown> 临时优先尝试输出方式')
 }
 
 /** 从 action options 提取 modeOverride 附加到 payload */
-export function withMode(payload: RenderPayload, options: any): RenderPayload {
+export function withMode(payload: RenderPayload, options: any, commandId?: CommandOutputId): RenderPayload {
   const override = parseModeOption(options?.mode)
-  return override ? { ...payload, modeOverride: override } : payload
+  return { ...payload, ...(commandId ? { commandId } : {}), ...(override ? { modeOverride: override } : {}) }
 }
 
 export { sendReply }

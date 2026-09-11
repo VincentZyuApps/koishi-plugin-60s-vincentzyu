@@ -107,11 +107,26 @@ export const usage = `
 <ul>
   <li><b>baseUrl</b>：60s API 地址，默认 <code>http://127.0.0.1:4399</code>；使用远端服务时请自行填写可用实例</li>
   <li><b>上游仓库</b>：<a href="https://github.com/vikiboss/60s">https://github.com/vikiboss/60s</a></li>
-  <li><b>渲染模式优先级表</b>：表格顺序 = 优先级，运行时取第一个可用方式</li>
-  <li><b>QQ 官方 Bot Markdown</b>：可选的 markdown + 按钮渲染，仅 QQ 官方 Bot 生效</li>
+  <li><b>renderPreset</b>：选择通用预设、QQ 官方 Bot 预设或逐命令严格自定义</li>
+  <li><b>QQ 官方 Bot Markdown</b>：QQ 官方 Bot 预设中的列表原生 Markdown，按钮发送方式可单选</li>
   <li><b>Puppeteer 卡片图</b>：安装 koishi-plugin-puppeteer 后可渲染精美卡片图</li>
-  <li><b>--mode / -m</b>：每条命令可临时优先尝试渲染方式（qq-auto / general-auto / text / image / qq-markdown）</li>
+  <li><b>--mode / -m</b>：每条命令可临时优先尝试输出方式（text / card / image / qq-markdown）</li>
 </ul>
+
+<details>
+  <summary>🖥️ 三种输出预设</summary>
+  <div class="group-body">
+  <p><code>general</code>（默认）按内容类型选择输出；列表卡片依赖 <code>koishi-plugin-puppeteer</code>，不可用时会回退文本。<code>qq-official</code> 在 QQ 官方 Bot 的列表优先原生 Markdown，其他平台按通用预设。<code>custom</code> 严格使用配置项中每条规范命令的选择，不可用时会报错而不降级。</p>
+  <table>
+    <tr><th>内容类型</th><th>默认输出</th><th>指令</th></tr>
+    <tr><td>列表 / 数据汇总</td><td>Puppeteer 卡片图</td><td>早报、历史、热榜、天气、汇率、油价、金价、摸鱼、IT、AI、黑客新闻、歌词、IP、密码、密码校验、健康、猫眼、酷安</td></tr>
+    <tr><td>单条内容</td><td>纯文本</td><td>一言、段子、笑话、发病、答案、运势、百科、翻译</td></tr>
+    <tr><td>原始图片</td><td>直接发送图片</td><td>早报 <code>-i</code>、二维码、QQ（有头像时）</td></tr>
+    <tr><td>早报无截图回退</td><td>官方早报图</td><td>早报有官方图且 Puppeteer 不可用时；官方图也不可用才发送文本</td></tr>
+  </table>
+  <p>可附加 <code>-m text</code> 临时读取列表文本，或用 <code>-m card</code> 让单条内容优先尝试截图。二维码与 QQ 资料在自定义模式可选择直接图片、嵌图卡片或文本提示。</p>
+  </div>
+</details>
 
 <h2>📌 命令分类</h2>
 

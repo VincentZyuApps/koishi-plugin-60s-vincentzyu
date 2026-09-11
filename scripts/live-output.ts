@@ -4,7 +4,8 @@ import { basename, join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
 
 import { apply } from '../src'
-import type { ColorMode, Config, ImageTheme, RenderMode } from '../src/config'
+import type { ColorMode, Config, ImageTheme } from '../src/config'
+import { DEFAULT_CUSTOM_COMMAND_OUTPUT, type OutputMode } from '../src/render/output'
 
 const PROJECT_ROOT = resolve(__dirname, '..')
 const KOISHI_ROOT = resolve(PROJECT_ROOT, '../..')
@@ -60,13 +61,13 @@ interface LiveCase extends CaseInput {
   id: string
   command: string
   expected: 'text' | 'image'
-  modes: RenderMode[]
+  modes: OutputMode[]
 }
 
 interface CaseResult {
   id: string
   command: string
-  mode: RenderMode
+  mode: OutputMode
   imageTheme?: ImageTheme
   colorMode?: ColorMode
   expected: string
@@ -283,8 +284,8 @@ export async function main() {
   try {
     const { ctx, registrations, logs } = createContext(browser)
     const config: Config = {
-      baseUrl, timeout: 30_000, commandPrefix: '60s', renderModePriority: [{ mode: 'text', enabled: true }], enableQuote: false, enableWaitingHint: false,
-      enableQQMarkdown: false, qqMarkdownKeyboardJson: '{}', qqMarkdownButtonMode: [], imageType: 'png', screenshotQuality: 88, imageWidth: 760,
+      baseUrl, timeout: 30_000, commandPrefix: '60s', renderPreset: 'general', customCommandOutput: { ...DEFAULT_CUSTOM_COMMAND_OUTPUT }, enableQuote: false, enableWaitingHint: false,
+      qqMarkdownKeyboardJson: '{}', qqMarkdownButtonMode: 'append-to-markdown', imageType: 'png', screenshotQuality: 88, imageWidth: 760,
       imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', verboseConsoleLog: false,
     }
     await apply(ctx, config)

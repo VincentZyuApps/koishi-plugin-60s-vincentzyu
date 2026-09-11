@@ -192,6 +192,26 @@ body {
   word-break: break-word;
 }
 
+/* 原图嵌入卡片 */
+.media-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+
+.media-image {
+  display: block;
+  max-width: 100%;
+  max-height: 680px;
+  object-fit: contain;
+  border: 1px solid var(--card-border);
+  background: #fff;
+}
+
+.media-image.square { width: min(460px, 100%); aspect-ratio: 1; }
+.media-image.circle { width: min(360px, 82vw); aspect-ratio: 1; border-radius: 50%; }
+.media-image.cover { width: 100%; max-height: 520px; object-fit: cover; }
+
 /* 天气专用 */
 .weather-main {
   display: flex;

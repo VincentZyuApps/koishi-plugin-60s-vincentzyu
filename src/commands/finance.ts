@@ -18,7 +18,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
           title: `💱 汇率（基准 ${data.base_code}）`,
           items: data.rates.slice(0, 15).map((r) => ({ text: `${r.currency}: ${r.rate}` })),
           footer: `更新: ${data.updated || '—'} · 60s API`,
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'exchange-rate')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -36,7 +36,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
           title: `⛽ 今日油价（${data.region}）`,
           items,
           footer: `更新: ${data.updated || '—'} · 60s API`,
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'fuel-price')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -66,7 +66,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
           title: `🥇 黄金价格（${data.date}）`,
           items,
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'gold-price')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -85,7 +85,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
             title: `🌤️ ${data.location.name} 天气预报`,
             items: data.daily_forecast.map((d) => ({ text: `${d.date} ${d.day_condition} ${d.min_temperature}~${d.max_temperature}°C` })),
             footer: '60s API',
-          }, 'hot', 'list'), options)
+          }, 'hot', 'list'), options, 'weather')
           await sendReply(ctx, session, client, config, { ...payload, text })
         } else {
           const data = await client.getWeatherRealtime(city)
@@ -111,7 +111,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
             infoLines,
             sections,
             footer: `更新: ${data.weather.updated || '—'} · 60s API`,
-          }, 'weather', 'list'), options)
+          }, 'weather', 'list'), options, 'weather')
           await sendReply(ctx, session, client, config, { ...payload, text })
         }
       }, { client, config, commandVerbose: options.verbose })

@@ -15,7 +15,7 @@ export async function sendQQMarkdown(
     markdown: { content: markdown },
   }
 
-  if (config.qqMarkdownButtonMode.includes(QQ_BUTTON_MODE.APPEND_QQ_MARKDOWN) && keyboard?.rows?.length) {
+  if (config.qqMarkdownButtonMode === QQ_BUTTON_MODE.APPEND_MARKDOWN && keyboard?.rows?.length) {
     payload.keyboard = { content: keyboard }
   }
 
@@ -31,27 +31,31 @@ export async function sendQQMarkdown(
   const bot = session.bot as any
   if (bot.config?.autoStreamText) {
     const attrs: any = { content: markdown }
-    if (config.qqMarkdownButtonMode.includes(QQ_BUTTON_MODE.APPEND_QQ_MARKDOWN) && keyboard?.rows?.length) {
+    if (config.qqMarkdownButtonMode === QQ_BUTTON_MODE.APPEND_MARKDOWN && keyboard?.rows?.length) {
       attrs.keyboard = keyboard
     }
     await session.send(h('qq:rawmarkdown', attrs))
+    await sendStandaloneButton(session, config, command)
     return
   }
 
   const qq = (session as any).qq
   if (qq?.sendPrivateMessage && session.isDirect) {
     await qq.sendPrivateMessage(session.channelId, payload)
+    await sendStandaloneButton(session, config, command)
     return
   }
   if (qq?.sendMessage) {
     await qq.sendMessage(session.channelId, payload)
+    await sendStandaloneButton(session, config, command)
     return
   }
   await bot.internal.sendMessage(session.channelId, payload)
+  await sendStandaloneButton(session, config, command)
 }
 
 export async function sendStandaloneButton(session: Session, config: Config, command?: string) {
-  if (!config.qqMarkdownButtonMode.includes(QQ_BUTTON_MODE.STANDALONE)) return
+  if (config.qqMarkdownButtonMode !== QQ_BUTTON_MODE.STANDALONE) return
   const keyboard = buildKeyboard(config, command)
   if (!keyboard?.rows?.length) return
   const payload: any = {

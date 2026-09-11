@@ -18,7 +18,7 @@ export async function registerInfoCommands(ctx: Context, config: Config, client:
           title: '📰 IT 资讯',
           items: items.slice(0, 15).map((i) => ({ text: i.title })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'it-news')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -34,7 +34,7 @@ export async function registerInfoCommands(ctx: Context, config: Config, client:
           title: `🤖 AI 资讯（${data.date}）`,
           items: data.news.slice(0, 15).map((i) => ({ text: i.title })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'ai-news')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -50,7 +50,7 @@ export async function registerInfoCommands(ctx: Context, config: Config, client:
           title: '🐙 Hacker News',
           items: items.map((i) => ({ text: i.title, hot: i.score })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'hacker-news')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })

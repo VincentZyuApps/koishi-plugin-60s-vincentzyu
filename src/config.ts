@@ -1,28 +1,14 @@
 import { Schema } from 'koishi'
-
-// ==================== 渲染模式枚举 ====================
-
-export const RENDER_MODE = {
-  QQ_AUTO: 'qq-auto',
-  GENERAL_AUTO: 'general-auto',
-  TEXT: 'text',
-  IMAGE: 'image',
-  QQ_MARKDOWN: 'qq-markdown',
-} as const
-
-export type RenderMode = typeof RENDER_MODE[keyof typeof RENDER_MODE]
-
-export const RENDER_MODE_NAMES: Record<RenderMode, string> = {
-  [RENDER_MODE.QQ_AUTO]: '🖥️ QQ 智能',
-  [RENDER_MODE.GENERAL_AUTO]: '📱 常规智能',
-  [RENDER_MODE.TEXT]: '🔤 纯文本',
-  [RENDER_MODE.IMAGE]: '🖼️ 图片 / Puppeteer 卡片图',
-  [RENDER_MODE.QQ_MARKDOWN]: '🤖 QQ 原生 Markdown',
-}
-
-export const DEFAULT_RENDER_PRIORITY = [
-  { mode: RENDER_MODE.GENERAL_AUTO, enabled: true },
-]
+import {
+  COMMAND_OUTPUT_DEFINITIONS,
+  DEFAULT_CUSTOM_COMMAND_OUTPUT,
+  OUTPUT_MODE,
+  OUTPUT_MODE_NAMES,
+  RENDER_PRESET,
+  type CommandOutputId,
+  type OutputMode,
+  type RenderPreset,
+} from './render/output'
 
 // ==================== 卡片主题 ====================
 
@@ -55,19 +41,16 @@ export type FontMode = typeof FONT_MODE[keyof typeof FONT_MODE]
 // ==================== QQ 按钮模式 ====================
 
 export const QQ_BUTTON_MODE = {
+  NONE: 'none',
   STANDALONE: 'standalone',
-  APPEND_QQ_MARKDOWN: 'append-qq-markdown',
-  APPEND_PUPPETEER_IMAGE: 'append-puppeteer-image',
+  APPEND_MARKDOWN: 'append-to-markdown',
 } as const
 
 export type QQButtonMode = typeof QQ_BUTTON_MODE[keyof typeof QQ_BUTTON_MODE]
 
 // ==================== 配置接口 ====================
 
-export interface RenderPriorityEntry {
-  mode: RenderMode
-  enabled: boolean
-}
+export type CustomCommandOutput = Record<CommandOutputId, OutputMode>
 
 export interface Config {
   // ⚙️ 基础
@@ -75,13 +58,13 @@ export interface Config {
   timeout: number
   commandPrefix: string
   // 🎨 渲染
-  renderModePriority: RenderPriorityEntry[]
+  renderPreset: RenderPreset
+  customCommandOutput: CustomCommandOutput
   enableQuote: boolean
   enableWaitingHint: boolean
   // 🤖 QQ官方bot
-  enableQQMarkdown: boolean
   qqMarkdownKeyboardJson: string
-  qqMarkdownButtonMode: QQButtonMode[]
+  qqMarkdownButtonMode: QQButtonMode
   // 🖼️ Puppeteer
   imageType: 'png' | 'jpeg' | 'webp'
   screenshotQuality: number
@@ -93,6 +76,29 @@ export interface Config {
   // 🔍 调试
   verboseConsoleLog: boolean
 }
+
+const CUSTOM_OUTPUT_GROUPS = [
+  ['news', '📰 早报与资讯'],
+  ['hot', '🔥 热榜来源'],
+  ['finance', '🌤️ 天气与行情'],
+  ['fun', '💬 娱乐与单条内容'],
+  ['tools', '🛠️ 工具'],
+] as const
+
+function outputModeSchema(definition: typeof COMMAND_OUTPUT_DEFINITIONS[number]) {
+  return Schema.union(definition.modes.map((mode) => Schema.const(mode).description(OUTPUT_MODE_NAMES[mode])))
+    .role('radio')
+    .default(definition.defaultMode)
+    .description(`🎯 ${definition.label} 的输出方式。`)
+}
+
+const customCommandOutputSchema = Schema.intersect(
+  CUSTOM_OUTPUT_GROUPS.map(([group, title]) => Schema.object(Object.fromEntries(
+    COMMAND_OUTPUT_DEFINITIONS
+      .filter((definition) => definition.group === group)
+      .map((definition) => [definition.id, outputModeSchema(definition)]),
+  )).description(title)),
+)
 
 // ==================== 配置 Schema ====================
 
@@ -121,28 +127,19 @@ export const Config: Schema<Config> = Schema.intersect([
 
   // 🎨 渲染设置
   Schema.object({
-    renderModePriority: Schema.array(Schema.object({
-      mode: Schema.union(
-        Object.values(RENDER_MODE).map((m) => Schema.const(m).description(`【${m}】${RENDER_MODE_NAMES[m]}`)),
-      )
-        .role('radio')
-        .description('渲染方式'),
-      enabled: Schema.boolean()
-        .default(true)
-        .description('是否启用'),
-    }))
-      .role('table')
-      .default(DEFAULT_RENDER_PRIORITY)
+    renderPreset: Schema.union([
+      Schema.const(RENDER_PRESET.GENERAL).description('📱 通用预设（推荐）'),
+      Schema.const(RENDER_PRESET.QQ_OFFICIAL).description('🤖 QQ 官方 Bot 预设'),
+      Schema.const(RENDER_PRESET.CUSTOM).description('⚙️ 自定义命令输出'),
+    ])
+      .role('radio')
+      .default(RENDER_PRESET.GENERAL)
       .description([
-        '🎨 渲染模式优先级表。运行时按表格从上到下逐项尝试，第一个可用方式即短路执行。',
-        '📋 表格顺序 = 优先级顺序，可拖动调整。重复的项只取第一个出现的位置。',
-        '<i>🖥️【qq-auto】QQ 官方 Bot 的列表类优先 QQ 原生 Markdown；非 QQ 平台按 general-auto 行为处理。</i>',
-        '<i>📱【general-auto】列表类优先 Puppeteer 卡片图，单条类使用文本，图片类直接发送图片。</i>',
-        '<i>🔤【text】始终使用纯文本，适用于任何平台。</i>',
-        '<i>🖼️【image】需要截图时依赖 koishi-plugin-puppeteer；已有远程图片时可直接发送。</i>',
-        '<i>🤖【qq-markdown】需要启用下方「QQ官方bot Markdown」且平台为 QQ 官方 Bot，否则会硬跳过至下一项。</i>',
-        '🔤 兜底始终是纯文本，任何平台都能收到。',
-        '💡 每条指令也支持 <code>-m/--mode</code> 临时优先尝试指定渲染方式；不可用时继续按本表处理。',
+        '🎨 选择插件的默认输出策略。',
+        '<i><code>【通用预设】</code>列表优先卡片图，单条内容纯文本，天然图片直接发送。</i>',
+        '<i><code>【QQ 官方 Bot 预设】</code>QQ 官方 Bot 的列表优先原生 Markdown；其他平台按通用预设输出。</i>',
+        '<i><code>【自定义命令输出】</code>严格按底部每条规范命令的选择执行；所选格式不可用时会返回错误，不自动降级。</i>',
+        '💡 每条指令可用 <code>-m/--mode &lt;text|card|image|qq-markdown&gt;</code> 临时优先尝试一种输出；失败后回到本预设规则。',
       ].join('<br/>')),
     enableQuote: Schema.boolean()
       .default(true)
@@ -154,12 +151,6 @@ export const Config: Schema<Config> = Schema.intersect([
 
   // 🤖 QQ官方bot
   Schema.object({
-    enableQQMarkdown: Schema.boolean()
-      .default(false)
-      .description([
-        '🤖 是否启用 QQ 官方 Bot 原生 Markdown 渲染。',
-        '启用后，在 QQ 官方 Bot 平台且渲染优先级命中 <code>qq-markdown</code> 时，使用 markdown + 按钮发送。',
-      ].join('<br/>')),
     qqMarkdownKeyboardJson: Schema.string()
       .role('textarea', { rows: [5, 10] })
       .default(JSON.stringify({
@@ -179,18 +170,18 @@ export const Config: Schema<Config> = Schema.intersect([
         ],
       }, null, 2))
       .description([
-        '📋 QQ Markdown 按钮 JSON 配置。只在 QQ 官方 Bot 群聊且命中 qq-markdown 渲染时使用。',
+        '📋 QQ Markdown 按钮 JSON 配置。只在命中 QQ 原生 Markdown 且按钮模式不是“不发按钮”时使用。',
         '支持变量 <code>${command}</code>（替换为触发时命中的子命令名）。',
         'JSON 解析失败或结构无效时自动退回默认按钮。',
       ].join('<br/>')),
-    qqMarkdownButtonMode: Schema.array(Schema.union([
-      Schema.const(QQ_BUTTON_MODE.STANDALONE).description('🧷 单独发送 JSON 按钮消息'),
-      Schema.const(QQ_BUTTON_MODE.APPEND_QQ_MARKDOWN).description('📎 挂在 QQ Markdown 后面'),
-      Schema.const(QQ_BUTTON_MODE.APPEND_PUPPETEER_IMAGE).description('🖼️ 挂在 Puppeteer 卡片图后面'),
-    ]))
-      .role('checkbox')
-      .default([QQ_BUTTON_MODE.APPEND_QQ_MARKDOWN])
-      .description('🤖 QQ Markdown 按钮发送行为，可多选。只对 QQ 官方 Bot 生效。'),
+    qqMarkdownButtonMode: Schema.union([
+      Schema.const(QQ_BUTTON_MODE.NONE).description('🚫 不发按钮'),
+      Schema.const(QQ_BUTTON_MODE.STANDALONE).description('🧷 单独发按钮'),
+      Schema.const(QQ_BUTTON_MODE.APPEND_MARKDOWN).description('📎 附在 QQ Markdown 后面'),
+    ])
+      .role('radio')
+      .default(QQ_BUTTON_MODE.APPEND_MARKDOWN)
+      .description('🤖 QQ Markdown 按钮发送方式。仅 QQ 官方 Bot 的原生 Markdown 输出生效。'),
   }).description('🤖 QQ 官方 Bot Markdown'),
 
   // 🖼️ Puppeteer
@@ -251,6 +242,16 @@ export const Config: Schema<Config> = Schema.intersect([
       .default('')
       .description('📁 自定义字体绝对路径，仅选择【custom-path】时生效。支持 <code>.ttf</code>、<code>.otf</code>、<code>.woff</code>、<code>.woff2</code>，路径位于 Koishi 服务端。'),
   }).description('🖼️ Puppeteer 卡片图'),
+
+  // ⚙️ 自定义指令输出
+  Schema.object({
+    customCommandOutput: customCommandOutputSchema
+      .default(DEFAULT_CUSTOM_COMMAND_OUTPUT)
+      .description([
+        '⚙️ 仅在上方选择「自定义命令输出」时生效。所有中文和英文 alias 共用同一项。',
+        '⚠️ 此模式严格执行：卡片图、直接图片或 QQ 原生 Markdown 不可用时会返回简洁错误；详细原因记录在控制台。',
+      ].join('<br/>')),
+  }).description('⚙️ 自定义指令输出'),
 
   // 🔍 调试
   Schema.object({

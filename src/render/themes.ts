@@ -1,6 +1,6 @@
 import type { ColorMode, ImageTheme } from '../config'
 
-export type TemplateName = 'daily' | 'hot' | 'weather' | 'simple'
+export type TemplateName = 'daily' | 'hot' | 'weather' | 'simple' | 'media'
 
 export const IMAGE_THEME_ATTR: Record<ImageTheme, string> = {
   koishi: 'koishi',

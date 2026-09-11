@@ -18,7 +18,7 @@ export async function registerNewsCommands(ctx: Context, config: Config, client:
         const text = formatDaily(data)
         // -i 直接发官方图片，不用 puppeteer
         if (options.image && data.image) {
-          const payload = withMode({ text, imageUrl: data.image, kind: 'image', modeOverride: 'image' }, options)
+          const payload = withMode({ text, imageUrl: data.image, kind: 'image', modeOverride: 'image' }, options, 'daily')
           await sendReply(ctx, session, client, config, payload)
           return
         }
@@ -30,7 +30,7 @@ export async function registerNewsCommands(ctx: Context, config: Config, client:
         }, 'daily', 'list')
         payload = { ...payload, text, markdown: text }
         if (data.image) payload.imageUrl = data.image
-        await sendReply(ctx, session, client, config, withMode(payload, options))
+        await sendReply(ctx, session, client, config, withMode(payload, options, 'daily'))
       }, { client, config, commandVerbose: options.verbose })
     })
 
@@ -47,7 +47,7 @@ export async function registerNewsCommands(ctx: Context, config: Config, client:
           title: `${data.date} 历史上的今天`,
           items: data.items.slice(0, 15).map((item) => ({ text: `${item.year} ${item.title}` })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'history')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })

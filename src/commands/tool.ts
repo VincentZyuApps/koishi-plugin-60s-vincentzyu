@@ -1,5 +1,4 @@
 import type { Context } from 'koishi'
-import { h } from 'koishi'
 import type { Config } from '../config'
 import type { Client } from '../client'
 import { addModeOption, cardPayload, makePayload, safeAction, sendReply, withMode } from './helper'
@@ -15,9 +14,18 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
     .action(async ({ session, options }, text) => {
       await safeAction(ctx, session, async () => {
         const data = await client.getQRCode(text, options.size || 256)
-        const img = h.image(data.data_uri)
-        const quote = config.enableQuote ? h.quote(session.messageId) : ''
-        await session.send(`${quote}${img}`)
+        const payload = withMode(cardPayload({
+          title: '🔳 二维码',
+          subtitle: '扫描或保存原图使用',
+          mediaUrl: data.data_uri,
+          mediaShape: 'square',
+          footer: '60s API',
+        }, 'media', 'image'), options, 'qrcode')
+        await sendReply(ctx, session, client, config, {
+          ...payload,
+          text: '本指令输出格式请在配置项改成图片。',
+          imageUrl: data.data_uri,
+        })
       }, { client, config, commandVerbose: options.verbose })
     })
 
@@ -38,7 +46,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '🌐 IP 查询',
           items: linesArr.map((l) => ({ text: l })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'ip')
         await sendReply(ctx, session, client, config, { ...payload, text: lines })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -60,7 +68,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '🔐 随机密码',
           items: linesArr.map((l) => ({ text: l })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'password')
         await sendReply(ctx, session, client, config, { ...payload, text: lines })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -80,7 +88,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '🔒 密码强度检测',
           items: lines.split('\n').filter((l) => l.trim()).map((l) => ({ text: l })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'password-check')
         await sendReply(ctx, session, client, config, { ...payload, text: lines })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -96,7 +104,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: `📖 ${data.title}`,
           body: data.abstract || data.description || '',
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'baike')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -118,7 +126,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           subtitle: `${data.source.type_desc || data.source.type} → ${data.target.type_desc || data.target.type}`,
           body: data.target.text || '',
           footer: data.target.pronounce ? `🔊 ${data.target.pronounce} · 60s API` : '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'translate')
         await sendReply(ctx, session, client, config, { ...payload, text: lines })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -136,7 +144,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           subtitle: (data.artists || []).join(', '),
           items: lines.map((l) => ({ text: l })),
           footer: data.album ? `💿 ${data.album} · 60s API` : '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'lyric')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -160,7 +168,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '❤️ 健康数据',
           items: linesArr.map((l) => ({ text: l })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'health')
         await sendReply(ctx, session, client, config, { ...payload, text: lines })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -176,7 +184,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '🎬 猫眼全球票房',
           items: items.slice(0, 15).map((i) => ({ text: i.title })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'maoyan')
         await sendReply(ctx, session, client, config, { ...payload, text: `🎬 猫眼全球票房\n\n${text}` })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -191,7 +199,7 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
           title: '📱 酷安热榜',
           items: items.slice(0, 15).map((i) => ({ text: i.title })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'kuan')
         await sendReply(ctx, session, client, config, { ...payload, text: `📱 酷安热榜\n\n${text}` })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -202,12 +210,15 @@ export async function registerToolCommands(ctx: Context, config: Config, client:
     .action(async ({ session, options }, qq) => {
       await safeAction(ctx, session, async () => {
         const data = await client.getQQProfile(qq)
-        if (data.avatar_url) {
-          const quote = config.enableQuote ? h.quote(session.messageId) : ''
-          await session.send(`${quote}${h.image(data.avatar_url)}`)
-        } else {
-          await sendReply(ctx, session, client, config, makePayload(`👤 QQ ${data.qq}: ${data.nickname}`))
-        }
+        const text = `👤 QQ ${data.qq}: ${data.nickname}`
+        const payload = withMode(cardPayload({
+          title: `👤 ${data.nickname || `QQ ${data.qq}`}`,
+          subtitle: `QQ: ${data.qq}`,
+          mediaUrl: data.avatar_url,
+          mediaShape: 'circle',
+          footer: '60s API',
+        }, 'media', 'image'), options, 'qq-profile')
+        await sendReply(ctx, session, client, config, { ...payload, text, imageUrl: data.avatar_url })
       }, { client, config, commandVerbose: options.verbose })
     })
 }

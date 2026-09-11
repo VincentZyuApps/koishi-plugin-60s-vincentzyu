@@ -18,7 +18,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           subtitle: '随机一句话',
           body: data.hitokoto || '',
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'hitokoto')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -34,7 +34,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           subtitle: '今日份快乐',
           body: data.duanzi || '',
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'duanzi')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -49,7 +49,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           title: '🤣 冷笑话',
           body: data.content || '',
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'joke')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -65,7 +65,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           subtitle: name ? `献给: ${name}` : '',
           body: text,
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'fabing')
         await sendReply(ctx, session, client, config, { ...payload, text: `💘 ${text}` })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -80,7 +80,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           title: '🔮 答案之书',
           body: data.answer || '',
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'answer')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -98,7 +98,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           title: `✨ 今日运势${rank ? `（${rank}级）` : ''}`,
           body: `${desc}：${tip}`,
           footer: '60s API',
-        }, 'simple', 'single'), options)
+        }, 'simple', 'single'), options, 'luck')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })
@@ -115,7 +115,7 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
           subtitle: '摸鱼进度',
           items: lines.slice(1).map((l) => ({ text: l.replace(/^[📊🎯🏖️🎉💬]\s*/, '') })),
           footer: '60s API',
-        }, 'hot', 'list'), options)
+        }, 'hot', 'list'), options, 'moyu')
         await sendReply(ctx, session, client, config, { ...payload, text })
       }, { client, config, commandVerbose: options.verbose })
     })

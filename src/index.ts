@@ -1,4 +1,4 @@
-import { Context } from 'koishi'
+import { Context, h } from 'koishi'
 
 import type { Config } from './config'
 import { Config as ConfigSchema } from './config'
@@ -26,7 +26,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.command(base, '📰 60s 开放 API 集合').alias('60s')
     .action(async ({ session }) => {
-      await session.send([
+      const message = [
         '📰 60s API 插件',
         `🔗 服务: ${config.baseUrl}`,
         '📦 上游仓库: https://github.com/vikiboss/60s',
@@ -43,7 +43,8 @@ export function apply(ctx: Context, config: Config) {
         `  ${base}.二维码 <文本> / ${base}.密码 / ${base}.IP`,
         '',
         '💡 发送「60s --help」查看完整帮助',
-      ].join('\n'))
+      ].join('\n')
+      await session.send(`${config.enableQuote ? h.quote(session.messageId) : ''}${h.text(message)}`)
     })
 
   registerNewsCommands(ctx, config, client)
