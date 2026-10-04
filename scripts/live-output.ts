@@ -198,11 +198,19 @@ function createContext(browser: any) {
       return { status: response.status, data }
     } finally { clearTimeout(timer) }
   }
-  const ctx: any = { baseDir: KOISHI_ROOT, logger, http, puppeteer: { page: () => browser.newPage() }, command: (declaration: string, _description?: string) => {
-    const registration: RegisteredCommand = { declaration, primary: declaration.split(' ')[0], aliases: [], options: [], subcommands: [] }
-    registrations.push(registration)
-    return createChain(registration)
-  } }
+  const ctx: any = {
+    baseDir: KOISHI_ROOT,
+    logger,
+    http,
+    puppeteer: { page: () => browser.newPage() },
+    on: () => {},
+    inject: () => {},
+    command: (declaration: string, _description?: string) => {
+      const registration: RegisteredCommand = { declaration, primary: declaration.split(' ')[0], aliases: [], options: [], subcommands: [] }
+      registrations.push(registration)
+      return createChain(registration)
+    },
+  }
   return { ctx, registrations, logs }
 }
 
@@ -286,7 +294,7 @@ export async function main() {
     const config: Config = {
       baseUrl, timeout: 30_000, commandPrefix: '60s', renderPreset: 'general', customCommandOutput: { ...DEFAULT_CUSTOM_COMMAND_OUTPUT }, enableQuote: false, enableWaitingHint: false,
       qqMarkdownKeyboardJson: '{}', qqMarkdownButtonMode: 'append-to-markdown', imageType: 'png', screenshotQuality: 88, imageWidth: 760,
-      imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', verboseConsoleLog: false,
+      imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', scheduleTimezoneGmtOffset: 8, scheduledTasks: [], verboseConsoleLog: false,
     }
     await apply(ctx, config)
     const imageVariants = options.imageTheme || options.colorMode

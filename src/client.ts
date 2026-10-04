@@ -96,8 +96,9 @@ export class Client {
       httpStatus = response?.status ?? -1
       raw = response?.data ?? response
     } catch (error: any) {
-      this.ctx.logger.warn(`[60s] 请求失败 ${url}: ${error?.message || error}`)
-      throw new ApiError(`60s API 请求失败: ${error?.message || error}`)
+      const detail = this.requestErrorDetail(error)
+      this.ctx.logger.warn(`[60s] 请求失败 ${url}: ${detail}`)
+      throw new ApiError(`60s API 请求失败: ${detail}`)
     }
 
     const cost = Date.now() - start
@@ -145,6 +146,15 @@ export class Client {
     } catch {
       return '无法摘要'
     }
+  }
+
+  /** 保留 fetch 底层网络原因，方便区分 DNS、超时和连接重置。 */
+  private requestErrorDetail(error: any): string {
+    const message = String(error?.message || error || '未知网络错误')
+    const cause = error?.cause
+    const causeCode = cause?.code ? ` (${cause.code})` : ''
+    const causeMessage = cause?.message && cause.message !== message ? `: ${cause.message}` : ''
+    return `${message}${causeCode}${causeMessage}`
   }
 
   // ==================== 核心 ====================

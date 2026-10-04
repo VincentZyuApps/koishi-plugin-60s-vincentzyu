@@ -1,11 +1,12 @@
 {
   "name": "koishi-plugin-60s-vincentzyu",
   "description": "📰 对接 60s 开放 API（https://github.com/vikiboss/60s），提供早报、热榜、天气与实用工具。🛠️",
-  "version": "0.2.0-alpha.1+20260911",
+  "version": "0.2.0-alpha.2+20261005",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
     "lib",
+    "dist",
     "templates"
   ],
   "homepage": "https://github.com/vikiboss/60s",
@@ -17,17 +18,25 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "test:live-output": "node -r esbuild-register scripts/live-output.ts"
+    "test:live-output": "node -r esbuild-register scripts/live-output.ts",
+    "test:api": "node -r esbuild-register scripts/test-api.ts"
   },
   "peerDependencies": {
+    "@koishijs/plugin-console": "^5.30.0",
     "koishi": "^4.18.7"
   },
   "peerDependenciesMeta": {
+    "@koishijs/plugin-console": {
+      "optional": true
+    },
     "koishi-plugin-puppeteer": {
       "optional": true
     }
   },
   "devDependencies": {
+    "@koishijs/client": "^5.30.0",
+    "@koishijs/plugin-console": "^5.30.0",
+    "@types/node-cron": "^3.0.11",
     "puppeteer-core": "22.6.1",
     "vitest": "^3.2.4"
   },
@@ -41,11 +50,13 @@
         "http"
       ],
       "optional": [
-        "puppeteer"
+        "puppeteer",
+        "console"
       ]
     }
   },
   "dependencies": {
-    "@chinese-fonts/lxgwwenkai": "^3.0.0"
+    "@chinese-fonts/lxgwwenkai": "^3.0.0",
+    "node-cron": "^3.0.3"
   }
 }

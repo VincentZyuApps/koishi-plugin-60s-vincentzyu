@@ -74,6 +74,22 @@ npm install koishi-plugin-60s-vincentzyu
 
 `npm-lxgw` 使用插件随附的霞鹜文楷且不联网。`release-lxgw` 会在首次使用时从 Gitee / GitHub Release 下载等宽版到 Koishi 根目录 `data/fonts`。所选字体不可用时截图会报错，不会静默改用其他字体。
 
+### ⏰ 定时任务
+
+| 配置项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `scheduleTimezoneGmtOffset` | `number` | `8` | Cron 使用的 GMT 偏移，范围 `-12` 至 `14`，默认 GMT+8 |
+| `scheduledTasks` | `ScheduledTaskConfig[]` | 5 条禁用示例 | 通用主动推送任务表 |
+| `scheduledTasks[].name` | `string` | 示例任务名 | 任务显示名称 |
+| `scheduledTasks[].command` | `string` | 示例 60s 指令 | 通过目标 Bot 的 `session.execute()` 执行的完整 Koishi 指令 |
+| `scheduledTasks[].cron` | `string` | 如 `0 8 * * *` | 五段 Cron：分、时、日、月、星期 |
+| `scheduledTasks[].platform/selfId/channelId` | `string` | 空 | 目标 Bot 平台、Bot ID 与频道/群号；三项均必填 |
+| `scheduledTasks[].enabled` | `boolean` | `false` | 启用后才注册；字段固定在表格最右侧 |
+
+默认预置但不启用：每日早报、上海天气、历史上的今天、B 站热搜、IT 之家热榜，时间依次为每天 08:00 至 08:20。任务失败仅写日志；同一任务连续失败 3 次时向目标发送一次简短提醒，任意成功会清零。
+
+管理员可执行 `60s.定时任务状态` 查看运行状态，或执行 `60s.定时任务执行` 立即运行全部已启用任务。启用 Koishi Console 后，插件详情也提供“刷新状态”和“立即执行全部启用任务”按钮；后者会真实发送消息并要求确认。
+
 ### 🔍 调试
 
 | 配置项 | 类型 | 默认值 | 说明 |
@@ -93,6 +109,8 @@ npm install koishi-plugin-60s-vincentzyu
 60s.百科 Koishi     百科
 60s.二维码 https://github.com/vikiboss/60s
 60s.密码 16 -s      生成含符号密码
+60s.定时任务状态     查看定时任务状态（管理员）
+60s.定时任务执行     立即执行全部启用任务（管理员）
 ```
 
 更多参数可使用 `60s.xxx --help` 查看。

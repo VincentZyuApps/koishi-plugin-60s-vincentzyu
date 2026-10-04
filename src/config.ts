@@ -48,6 +48,26 @@ export const QQ_BUTTON_MODE = {
 
 export type QQButtonMode = typeof QQ_BUTTON_MODE[keyof typeof QQ_BUTTON_MODE]
 
+// ==================== 定时任务 ====================
+
+export interface ScheduledTaskConfig {
+  name: string
+  command: string
+  cron: string
+  platform: string
+  selfId: string
+  channelId: string
+  enabled: boolean
+}
+
+export const DEFAULT_SCHEDULED_TASKS: ScheduledTaskConfig[] = [
+  { name: '📰 每日早报', command: '60s.早报', cron: '0 8 * * *', platform: '', selfId: '', channelId: '', enabled: false },
+  { name: '🌤️ 上海天气', command: '60s.天气 上海', cron: '5 8 * * *', platform: '', selfId: '', channelId: '', enabled: false },
+  { name: '📜 历史上的今天', command: '60s.历史', cron: '10 8 * * *', platform: '', selfId: '', channelId: '', enabled: false },
+  { name: '📺 B 站热搜', command: '60s.热榜.bili', cron: '15 8 * * *', platform: '', selfId: '', channelId: '', enabled: false },
+  { name: '💻 IT 之家热榜', command: '60s.热榜.it-rank', cron: '20 8 * * *', platform: '', selfId: '', channelId: '', enabled: false },
+]
+
 // ==================== 配置接口 ====================
 
 export type CustomCommandOutput = Record<CommandOutputId, OutputMode>
@@ -73,6 +93,9 @@ export interface Config {
   colorMode: ColorMode
   fontMode: FontMode
   customFontPath: string
+  // ⏰ 定时任务
+  scheduleTimezoneGmtOffset: number
+  scheduledTasks: ScheduledTaskConfig[]
   // 🔍 调试
   verboseConsoleLog: boolean
 }
@@ -102,7 +125,7 @@ const customCommandOutputSchema = Schema.intersect(
 
 // ==================== 配置 Schema ====================
 
-export const Config: Schema<Config> = Schema.intersect([
+export const Config = Schema.intersect([
   // ⚙️ 基础设置
   Schema.object({
     baseUrl: Schema.string()
@@ -243,6 +266,32 @@ export const Config: Schema<Config> = Schema.intersect([
       .description('📁 自定义字体绝对路径，仅选择【custom-path】时生效。支持 <code>.ttf</code>、<code>.otf</code>、<code>.woff</code>、<code>.woff2</code>，路径位于 Koishi 服务端。'),
   }).description('🖼️ Puppeteer 卡片图'),
 
+  // ⏰ 定时任务
+  Schema.object({
+    scheduleTimezoneGmtOffset: Schema.number()
+      .min(-12)
+      .max(14)
+      .step(1)
+      .default(8)
+      .description('🌍 Cron 时区 GMT 偏移。默认 <code>8</code> 即 GMT+8；不受 Koishi 宿主机时区影响。'),
+    scheduledTasks: Schema.array(Schema.object({
+      name: Schema.string().default('').description('📝 任务名'),
+      command: Schema.string().default('').description('⌨️ 完整 Koishi 指令，交由 Session.execute() 执行'),
+      cron: Schema.string().default('0 8 * * *').description('⏰ 五段 Cron：分 时 日 月 星期'),
+      platform: Schema.string().default('').description('🎯 Bot 平台，如 onebot / qq'),
+      selfId: Schema.string().default('').description('🤖 Bot selfId'),
+      channelId: Schema.string().default('').description('📡 频道或群号'),
+      enabled: Schema.boolean().default(false).description('✅ 是否启用'),
+    }))
+      .role('table')
+      .default(DEFAULT_SCHEDULED_TASKS)
+      .description([
+        '⏰ 通用 Cron 主动推送任务。仅启用且填写完整 <code>platform</code>、<code>selfId</code>、<code>channelId</code> 的行会注册。',
+        '执行时使用对应 Bot 建立主动 Session，并调用 <code>session.execute(command)</code>，因此复用普通指令的输出、渲染和平台适配。',
+        'Cron 使用五段式：<code>0 8 * * *</code> 表示每天 08:00。连续失败 3 次会向目标发送一次简短提醒；任意成功会重置计数。',
+      ].join('<br/>')),
+  }).description('⏰ 定时任务'),
+
   // ⚙️ 自定义指令输出
   Schema.object({
     customCommandOutput: customCommandOutputSchema
@@ -263,4 +312,4 @@ export const Config: Schema<Config> = Schema.intersect([
         '每条指令也支持 <code>--verbose</code> 选项临时开启（优先级高于此配置）。',
       ].join('<br/>')),
   }).description('🔍 调试'),
-])
+]) as Schema<Config>

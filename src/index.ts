@@ -9,12 +9,14 @@ import { registerFunCommands } from './commands/fun'
 import { registerFinanceCommands } from './commands/finance'
 import { registerToolCommands } from './commands/tool'
 import { registerInfoCommands } from './commands/info'
+import { ScheduledTaskService } from './schedule/scheduler'
+import { applyScheduledTaskConsole } from './schedule/console'
 
 export const name = '60s-vincentzyu'
 
 export const inject = {
   required: ['http'],
-  optional: ['puppeteer'],
+  optional: ['puppeteer', 'console'],
 }
 
 export { ConfigSchema as Config }
@@ -23,6 +25,11 @@ export { usage } from './usage'
 export function apply(ctx: Context, config: Config) {
   const client = new Client(ctx, config)
   const base = config.commandPrefix
+  const scheduledTasks = new ScheduledTaskService(ctx, config)
+
+  ctx.on('ready', () => scheduledTasks.start())
+  ctx.on('dispose', () => scheduledTasks.stop())
+  applyScheduledTaskConsole(ctx, scheduledTasks)
 
   ctx.command(base, '📰 60s 开放 API 集合').alias('60s')
     .action(async ({ session }) => {
@@ -53,4 +60,24 @@ export function apply(ctx: Context, config: Config) {
   registerFinanceCommands(ctx, config, client)
   registerToolCommands(ctx, config, client)
   registerInfoCommands(ctx, config, client)
+
+  ctx.command(`${base}.定时任务状态`, '⏰ 查看 60s 定时任务状态', { authority: 3 })
+    .action(async ({ session }) => {
+      const { timezoneGmtOffset, tasks } = scheduledTasks.getStatus()
+      const lines = [
+        `⏰ 60s 定时任务 | GMT${timezoneGmtOffset >= 0 ? '+' : ''}${timezoneGmtOffset}`,
+        ...tasks.map((task) => `${task.enabled ? '✅' : '⏸️'} ${task.name || `任务 ${task.index + 1}`} | ${task.cron} | ${task.registered ? '已注册' : '未注册'} | 连续失败 ${task.consecutiveFailures}${task.lastMessage ? `\n   ${task.lastMessage}` : ''}`),
+      ]
+      await session.send(`${config.enableQuote ? h.quote(session.messageId) : ''}${h.text(lines.join('\n'))}`)
+    })
+
+  ctx.command(`${base}.定时任务执行`, '🚀 立即执行全部已启用的 60s 定时任务', { authority: 3 })
+    .action(async ({ session }) => {
+      const results = await scheduledTasks.executeEnabled('command')
+      const success = results.filter((item) => item.ok).length
+      const lines = results.length
+        ? [`🚀 定时任务执行完成：${success}/${results.length} 成功`, ...results.map((item) => `${item.ok ? '✅' : '❌'} ${item.name}: ${item.message}`)]
+        : ['⏸️ 当前没有启用的定时任务。']
+      await session.send(`${config.enableQuote ? h.quote(session.messageId) : ''}${h.text(lines.join('\n'))}`)
+    })
 }

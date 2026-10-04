@@ -17,11 +17,14 @@ yarn workspace koishi-plugin-60s-vincentzyu test test/utils/font.test.ts
 yarn workspace koishi-plugin-60s-vincentzyu test test/render/dispatch.test.ts
 yarn workspace koishi-plugin-60s-vincentzyu test test/commands/hot.test.ts
 yarn workspace koishi-plugin-60s-vincentzyu test test/scripts/live-output.test.ts
+yarn workspace koishi-plugin-60s-vincentzyu test test/schedule/scheduler.test.ts
 ```
 
 ## 真实 API 冒烟测试
 
 默认测试不会联网。下面的测试只会对 60s 服务发起 GET 请求，不会修改远端数据喵。
+
+`test/schedule/scheduler.test.ts` 不会注册真实定时器或发送外部消息，覆盖 GMT+8 映射、Cron 校验、主动 Session 执行和连续失败提醒策略。
 
 PowerShell：
 

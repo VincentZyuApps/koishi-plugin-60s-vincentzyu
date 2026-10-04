@@ -4,6 +4,7 @@ import type { Config } from '../config'
 import type { Client } from '../client'
 import { renderCard } from './index'
 import { sendQQMarkdown } from '../qq/markdown'
+import { isScheduledSession } from '../schedule/runtime'
 import {
   COMMAND_OUTPUT_BY_ID,
   OUTPUT_MODE,
@@ -54,6 +55,10 @@ function isQQOfficial(session: Session): boolean {
 
 function canUseImage(ctx: Context): boolean {
   return !!(ctx as any).puppeteer
+}
+
+function shouldQuote(session: Session, config: Config): boolean {
+  return config.enableQuote && !isScheduledSession(session) && !!session.messageId
 }
 
 function generalOutput(payload: RenderPayload): OutputMode {
@@ -155,7 +160,7 @@ async function renderWithMode(
       try {
         const dataUrl = await renderCard(ctx, config, payload.cardData, payload.cardTemplate || 'hot')
         const img = h.image(dataUrl)
-        const elements = `${config.enableQuote ? h.quote(session.messageId) : ''}${img}`
+        const elements = `${shouldQuote(session, config) ? h.quote(session.messageId) : ''}${img}`
         return { elements, mode: OUTPUT_MODE.CARD }
       } catch (e) {
         ctx.logger.warn(`[60s] puppeteer 渲染失败，fallback: ${e?.message || e}`)
@@ -169,7 +174,7 @@ async function renderWithMode(
   if (mode === OUTPUT_MODE.IMAGE) {
     if (!payload.imageUrl) return null
     const img = h.image(payload.imageUrl)
-    const elements = `${config.enableQuote ? h.quote(session.messageId) : ''}${img}`
+    const elements = `${shouldQuote(session, config) ? h.quote(session.messageId) : ''}${img}`
     return { elements, mode: OUTPUT_MODE.IMAGE }
   }
 
@@ -181,7 +186,7 @@ async function renderWithMode(
 }
 
 function renderText(ctx: Context, session: Session, config: Config, payload: RenderPayload): RenderResult {
-  const elements = `${config.enableQuote ? h.quote(session.messageId) : ''}${h.text(payload.text)}`
+  const elements = `${shouldQuote(session, config) ? h.quote(session.messageId) : ''}${h.text(payload.text)}`
   return { elements, mode: OUTPUT_MODE.TEXT }
 }
 
@@ -194,8 +199,8 @@ export async function sendReply(
   payload: RenderPayload,
   command?: string,
 ): Promise<void> {
-  if (config.enableWaitingHint) {
-    const waitingHint = `${config.enableQuote ? h.quote(session.messageId) : ''}${h.text('⏳ 获取中，请稍候…')}`
+  if (config.enableWaitingHint && !isScheduledSession(session)) {
+    const waitingHint = `${shouldQuote(session, config) ? h.quote(session.messageId) : ''}${h.text('⏳ 获取中，请稍候…')}`
     const hintId = (await session.send(waitingHint))[0]
     try {
       const result = await renderReply(ctx, session, client, config, payload, command)

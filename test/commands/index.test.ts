@@ -38,7 +38,8 @@ describe('plugin entry', () => {
     await apply(ctx, makeConfig())
 
     const hasModeOption = (registration: any) => registration.options.some(([name]: [string]) => name === 'mode')
-    for (const registration of registrations.filter((entry) => entry.primary !== '60s')) {
+    const replyCommands = registrations.filter((entry) => entry.primary !== '60s' && !entry.primary.startsWith('60s.定时任务'))
+    for (const registration of replyCommands) {
       expect(hasModeOption(registration)).toBe(true)
       for (const subcommand of registration.subcommands) {
         expect(hasModeOption(subcommand)).toBe(true)

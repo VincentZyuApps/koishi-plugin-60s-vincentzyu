@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { parseModeOption } from '../../src/commands/helper'
 import { OutputUnavailableError, renderReply, sendReply } from '../../src/render/dispatch'
 import { DEFAULT_CUSTOM_COMMAND_OUTPUT } from '../../src/render/output'
+import { markScheduledSession } from '../../src/schedule/runtime'
 import { makeConfig, makeSession } from '../helpers/setup'
 
 describe('render/dispatch', () => {
@@ -44,5 +45,14 @@ describe('render/dispatch', () => {
     expect(session.send.mock.calls[0][0]).toContain('<quote id="msg-1">')
     expect(session.send.mock.calls[1][0]).toContain('早报内容')
     expect(session.bot.deleteMessage).toHaveBeenCalledWith('456', 'mock-msg-id')
+  })
+
+  it('定时任务不发送等待提示或引用空消息', async () => {
+    const session = makeSession({ messageId: '' })
+    markScheduledSession(session)
+    await sendReply({ logger: { warn() {} } } as any, session, {} as any, makeConfig({ enableQuote: true, enableWaitingHint: true }), { text: '定时早报' })
+    expect(session.send).toHaveBeenCalledTimes(1)
+    expect(session.send.mock.calls[0][0]).not.toContain('<quote')
+    expect(session.send.mock.calls[0][0]).toContain('定时早报')
   })
 })

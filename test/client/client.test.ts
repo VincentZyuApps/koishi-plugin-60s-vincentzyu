@@ -89,6 +89,16 @@ describe('Client', () => {
       })
     })
 
+    it('includes the underlying network cause in failures', async () => {
+      const error: any = new Error('fetch failed')
+      error.cause = { code: 'ECONNRESET', message: 'socket hang up' }
+      const http = vi.fn().mockRejectedValue(error)
+      const client = new Client(makeCtx(http), config)
+      await expect(client.getBili()).rejects.toMatchObject({
+        message: expect.stringContaining('ECONNRESET'),
+      })
+    })
+
     it('filters out undefined/false params but keeps numbers', async () => {
       const http = vi.fn().mockResolvedValue({ status: 200, data: successBody([]) })
       const client = new Client(makeCtx(http), config)

@@ -64,6 +64,9 @@ export function mockCommandContext(extraLogger: any = {}) {
       registrations.push(reg)
       return createChain(reg)
     }),
+    bots: [],
+    on: vi.fn(),
+    inject: vi.fn(),
   }
 
   return { ctx, registrations }

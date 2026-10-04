@@ -2,6 +2,7 @@ import type { Context, Session } from 'koishi'
 import { h } from 'koishi'
 import type { Config } from '../config'
 import { OUTPUT_MODE, type CommandOutputId, type OutputMode } from '../render/output'
+import { isScheduledSession, markScheduledFailure } from '../schedule/runtime'
 import type { Client } from '../client'
 import { sendReply, type CardData, type CardTemplate, type RenderPayload } from '../render/dispatch'
 export interface CommandCtx {
@@ -76,11 +77,15 @@ export async function safeAction(
     if (e?.stack) ctx.logger.debug(`[60s] 堆栈: ${e.stack}`)
 
     // session 输出给用户（404 已在 client 层生成友好文案，直接展示）
-    try {
-      const quote = config?.enableQuote ? h.quote(session.messageId) : ''
-      await session.send(`${quote}${h.text(`❌ ${hint}`)}`)
-    } catch {
-      // 发送失败就静默，避免二次异常
+    if (isScheduledSession(session)) {
+      markScheduledFailure(session, hint)
+    } else {
+      try {
+        const quote = config?.enableQuote ? h.quote(session.messageId) : ''
+        await session.send(`${quote}${h.text(`❌ ${hint}`)}`)
+      } catch {
+        // 发送失败就静默，避免二次异常
+      }
     }
   } finally {
     if (client && prevVerbose !== undefined) client.setVerbose(prevVerbose)

@@ -110,6 +110,7 @@ export const usage = `
   <li><b>renderPreset</b>：选择通用预设、QQ 官方 Bot 预设或逐命令严格自定义</li>
   <li><b>QQ 官方 Bot Markdown</b>：QQ 官方 Bot 预设中的列表原生 Markdown，按钮发送方式可单选</li>
   <li><b>Puppeteer 卡片图</b>：安装 koishi-plugin-puppeteer 后可渲染精美卡片图</li>
+  <li><b>定时任务</b>：按固定 GMT 偏移执行完整 Koishi 指令，并独立指定 platform / selfId / channelId</li>
   <li><b>--mode / -m</b>：每条命令可临时优先尝试输出方式（text / card / image / qq-markdown）</li>
 </ul>
 
@@ -125,6 +126,14 @@ export const usage = `
     <tr><td>早报无截图回退</td><td>官方早报图</td><td>早报有官方图且 Puppeteer 不可用时；官方图也不可用才发送文本</td></tr>
   </table>
   <p>可附加 <code>-m text</code> 临时读取列表文本，或用 <code>-m card</code> 让单条内容优先尝试截图。二维码与 QQ 资料在自定义模式可选择直接图片、嵌图卡片或文本提示。</p>
+  </div>
+</details>
+
+<details>
+  <summary>⏰ 定时任务与主动推送</summary>
+  <div class="group-body">
+  <p>在配置表中启用任务后，插件会按五段式 Cron 在 <code>scheduleTimezoneGmtOffset</code> 指定的 GMT 偏移执行。每行必须填写完整指令与 <code>platform</code>、<code>selfId</code>、<code>channelId</code>，任务会使用目标 Bot 的主动 Session 调用 <code>session.execute()</code>。</p>
+  <p>默认提供每日早报、上海天气、历史上的今天、B 站热搜和 IT 之家热榜五条禁用示例。连续失败 3 次仅提醒目标一次；任意成功即重置计数。管理员可执行 <code>60s.定时任务状态</code> 或 <code>60s.定时任务执行</code>，Console 插件详情也提供状态和立即执行按钮。</p>
   </div>
 </details>
 
