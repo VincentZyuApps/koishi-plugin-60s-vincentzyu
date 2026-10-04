@@ -51,7 +51,7 @@ export function renderCardToHtml(data: CardData, config: Config, template: CardT
 
   if (template === 'weather') {
     return buildCardHtml('weather', {
-      title: data.title,
+      title: (data.title || '').replace(/^🌤️\s*/, ''),
       subtitle: data.subtitle ?? '',
       temp: data.temp ?? '',
       info_html: data.infoLines ? data.infoLines.map((l) => `<div>${l}</div>`).join('') : '',

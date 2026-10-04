@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-60s-vincentzyu",
   "description": "📰 对接 60s 开放 API（https://github.com/vikiboss/60s），提供早报、热榜、天气与实用工具。🛠️",
-  "version": "0.2.0-alpha.2+20261005",
+  "version": "0.2.1-alpha.3+20261005",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -19,7 +19,8 @@
   "scripts": {
     "test": "vitest run",
     "test:live-output": "node -r esbuild-register scripts/live-output.ts",
-    "test:api": "node -r esbuild-register scripts/test-api.ts"
+    "test:api": "node -r esbuild-register scripts/test-api.ts",
+    "test:preview": "node -r esbuild-register scripts/live-output.ts --gen-preview-image --image-theme github --only daily,weather,hot-weibo,history,moyu"
   },
   "peerDependencies": {
     "@koishijs/plugin-console": "^5.30.0",

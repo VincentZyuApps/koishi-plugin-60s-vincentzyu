@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
@@ -17,6 +17,19 @@ export const CARD_VARIANTS: ReadonlyArray<{ imageTheme: ImageTheme, colorMode: E
   { imageTheme: 'github', colorMode: 'light' },
   { imageTheme: 'github', colorMode: 'dark' },
 ]
+
+export const PREVIEW_TARGETS: Record<string, string> = {
+  'daily--image--github--dark.png': 'daily-github-dark.png',
+  'daily--image--github--light.png': 'daily-github-light.png',
+  'weather--image--github--dark.png': 'weather-github-dark.png',
+  'weather--image--github--light.png': 'weather-github-light.png',
+  'hot-weibo--image--github--dark.png': 'hot-weibo-github-dark.png',
+  'hot-weibo--image--github--light.png': 'hot-weibo-github-light.png',
+  'history--image--github--dark.png': 'history-github-dark.png',
+  'history--image--github--light.png': 'history-github-light.png',
+  'moyu--image--github--dark.png': 'moyu-github-dark.png',
+  'moyu--image--github--light.png': 'moyu-github-light.png',
+}
 
 export const BROWSER_CANDIDATES = [
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -41,6 +54,8 @@ export interface LiveOptions {
   only?: string[]
   imageTheme?: ImageTheme
   colorMode?: ColorMode
+  genPreviewImage?: boolean
+  previewDir?: string
 }
 
 export interface RegisteredCommand {
@@ -83,8 +98,12 @@ export function parseCli(argv: string[]): LiveOptions {
   const out: LiveOptions = { outputDir: DEFAULT_OUTPUT_DIR, keepRuns: 5 }
   for (let index = 0; index < argv.length; index += 1) {
     const key = argv[index]
-    const value = argv[index + 1]
     if (!key.startsWith('--')) throw new Error(`未知参数：${key}`)
+    if (key === '--gen-preview-image' || key === '--preview') {
+      out.genPreviewImage = true
+      continue
+    }
+    const value = argv[index + 1]
     if (!value || value.startsWith('--')) throw new Error(`${key} 需要一个值`)
     index += 1
     switch (key) {
@@ -93,6 +112,7 @@ export function parseCli(argv: string[]): LiveOptions {
       case '--browser-path-file': out.browserPathFile = value; break
       case '--inputs': out.inputs = value; break
       case '--output-dir': out.outputDir = resolve(value); break
+      case '--preview-dir': out.previewDir = resolve(value); break
       case '--keep-runs': {
         const parsed = Number(value)
         if (!Number.isInteger(parsed) || parsed < 1) throw new Error('--keep-runs 必须是正整数')
@@ -260,6 +280,41 @@ function reportMarkdown(results: CaseResult[], baseUrl: string, browser: { path:
   return `${lines.join('\n')}\n`
 }
 
+async function syncPreviewImages(imageDir: string, options: LiveOptions) {
+  const outputPreviewDir = join(options.outputDir, 'preview')
+  const docsPreviewDir = options.previewDir || join(PROJECT_ROOT, 'docs', 'images', 'preview')
+
+  await mkdir(outputPreviewDir, { recursive: true })
+  if (options.genPreviewImage) {
+    await mkdir(docsPreviewDir, { recursive: true })
+  }
+
+  const generated = await readdir(imageDir)
+  const copiedToDocs: string[] = []
+  const copiedToOutput: string[] = []
+
+  for (const file of generated) {
+    const src = join(imageDir, file)
+    await copyFile(src, join(outputPreviewDir, file))
+    copiedToOutput.push(file)
+
+    if (options.genPreviewImage) {
+      const targetName = PREVIEW_TARGETS[file]
+      if (targetName) {
+        await copyFile(src, join(docsPreviewDir, targetName))
+        copiedToDocs.push(`${file} -> ${targetName}`)
+      }
+    }
+  }
+
+  if (copiedToOutput.length) {
+    console.log(`[Preview] 已更新本地预览目录: ${outputPreviewDir} (${copiedToOutput.length} 张图片)`)
+  }
+  if (options.genPreviewImage && copiedToDocs.length) {
+    console.log(`[Preview] 已同步到文档预览目录: ${docsPreviewDir}:\n  - ${copiedToDocs.join('\n  - ')}`)
+  }
+}
+
 export async function main() {
   const options = parseCli(process.argv.slice(2))
   const configText = await readFile(join(KOISHI_ROOT, 'koishi.yml'), 'utf8')
@@ -297,9 +352,13 @@ export async function main() {
       imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', scheduleTimezoneGmtOffset: 8, scheduledTasks: [], verboseConsoleLog: false,
     }
     await apply(ctx, config)
-    const imageVariants = options.imageTheme || options.colorMode
-      ? [{ imageTheme: options.imageTheme || 'github', colorMode: options.colorMode || 'light' }]
-      : CARD_VARIANTS
+    const theme = options.imageTheme
+    const colorMode = options.colorMode
+    const imageVariants = CARD_VARIANTS.filter((v) => {
+      if (theme && v.imageTheme !== theme) return false
+      if (colorMode && v.colorMode !== colorMode) return false
+      return true
+    })
     for (const item of selected) for (const mode of item.modes) for (const variant of mode === 'image' ? imageVariants : [undefined]) {
       const started = Date.now()
       const startLog = logs.length
@@ -315,7 +374,8 @@ export async function main() {
         const command = findCommand(registrations, item.command)
         if (!command?.action) throw new Error(`未找到已注册命令：${item.command}`)
         const session: any = { platform: 'onebot', userId: 'live-output', channelId: 'live-output', messageId: 'live-output', timestamp: Date.now(), bot: { config: {}, deleteMessage: async () => {} }, send: async (content: string) => { sent.push(String(content)); return ['live-output'] } }
-        await command.action({ session, options: { ...item.options, mode } }, ...item.args)
+        const actionOptions = { ...item.options, mode: mode === 'image' && item.expected !== 'image' ? 'card' : mode }
+        await command.action({ session, options: actionOptions }, ...item.args)
         const content = sent.join('\n\n')
         if (!content) throw new Error('命令没有发送任何内容')
         if (/^❌|\n❌/.test(content)) throw new Error(content)
@@ -346,6 +406,7 @@ export async function main() {
   await writeFile(join(runDir, 'report.json'), JSON.stringify(results, null, 2), 'utf8')
   await writeFile(join(runDir, 'report.md'), reportMarkdown(results, baseUrl, browserPath), 'utf8')
   await pruneRuns(runsDir, options.keepRuns)
+  await syncPreviewImages(imageDir, options)
   const failed = results.filter((item) => !item.ok)
   console.log(`验收完成：${results.length - failed.length}/${results.length} 通过，报告：${join(runDir, 'report.md')}`)
   if (failed.length) process.exitCode = 1

@@ -6,6 +6,8 @@ describe('live-output helpers', () => {
     expect(parseCli(['--base-url', 'http://example.test', '--keep-runs', '3', '--only', 'daily,weather']).baseUrl).toBe('http://example.test')
     expect(parseCli(['--base-url', 'http://example.test', '--keep-runs', '3', '--only', 'daily,weather']).only).toEqual(['daily', 'weather'])
     expect(parseCli(['--image-theme', 'github', '--color-mode', 'dark'])).toMatchObject({ imageTheme: 'github', colorMode: 'dark' })
+    expect(parseCli(['--gen-preview-image', '--preview-dir', 'D:\\preview']).genPreviewImage).toBe(true)
+    expect(parseCli(['--preview']).genPreviewImage).toBe(true)
     expect(() => parseCli(['--keep-runs', '0'])).toThrow('正整数')
     expect(() => parseCli(['--color-mode', 'sepia'])).toThrow('仅支持')
   })

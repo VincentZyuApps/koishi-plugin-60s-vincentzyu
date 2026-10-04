@@ -105,7 +105,7 @@ export async function registerFinanceCommands(ctx: Context, config: Config, clie
             sections.push({ title: '⚠️ 预警', lines: data.alerts.map((a) => `${a.type}(${a.level}): ${a.detail}`) })
           }
           const payload = withMode(cardPayload({
-            title: `🌤️ ${data.location.name}`,
+            title: data.location.name,
             subtitle: data.weather.condition,
             temp: `${data.weather.temperature}°C`,
             infoLines,

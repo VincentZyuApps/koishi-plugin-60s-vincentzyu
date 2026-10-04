@@ -85,6 +85,8 @@ yarn workspace koishi-plugin-60s-vincentzyu test:live-output --browser-path-file
 }
 ```
 
-可用的额外参数为 `--base-url`、`--browser-path`、`--browser-path-file`、`--inputs`、`--output-dir`、`--keep-runs`、`--only`、`--image-theme` 与 `--color-mode` 喵。未指定主题参数时，验收脚本会固定生成四套明确配色，保证无头截图可复现喵。
+可用的额外参数为 `--base-url`、`--browser-path`、`--browser-path-file`、`--inputs`、`--output-dir`、`--keep-runs`、`--only`、`--image-theme`、`--color-mode` 与 `--gen-preview-image` 喵。未指定主题参数时，验收脚本会固定生成四套明确配色，保证无头截图可复现喵。
+
+默认情况下，截图会保存在被 Git 忽略的 `output/runs/<时间戳>/images/` 和 `output/preview/` 中供本地检视喵。当指定 `--gen-preview-image`（或快捷命令 `yarn workspace koishi-plugin-60s-vincentzyu test:preview`）时，会将早报、天气、热搜等精选卡片自动重命名同步到 `docs/images/preview/`，以便 README 引用喵。
 
 每轮输出位于 `external/60s-vincentzyu/output/runs/<时间戳>/`，包含 `text/`、`images/`、`manifest.json`、`report.json` 和 `report.md` 喵。该目录已在 `.gitignore` 忽略，默认仅保留最近五轮结果喵。

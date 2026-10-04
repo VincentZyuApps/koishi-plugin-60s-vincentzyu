@@ -4,6 +4,18 @@
 
 对接 [60s](https://github.com/vikiboss/60s) 开放 API 的 Koishi 插件。它提供每日早报、热榜、天气、汇率、娱乐资讯和常用小工具，并支持纯文本、Puppeteer 卡片图与 QQ 官方 Bot Markdown 输出。
 
+## ✨ 效果预览
+
+统一采用高级科技感 GitHub 主题卡片，完美支持宿主环境与聊天软件的昼夜明暗自适应。在无头浏览器不可用时，插件会自动优雅回退为原生 Markdown 或清晰纯文本。
+
+| 功能模块 | 深色模式（Dark） | 浅色模式（Light） |
+| :--- | :---: | :---: |
+| **每日早报**<br>`60s.早报` | ![早报 深色](./docs/images/preview/daily-github-dark.png) | ![早报 浅色](./docs/images/preview/daily-github-light.png) |
+| **实时天气**<br>`60s.天气 上海` | ![天气 深色](./docs/images/preview/weather-github-dark.png) | ![天气 浅色](./docs/images/preview/weather-github-light.png) |
+| **微博热搜**<br>`60s.热榜 weibo` | ![热搜 深色](./docs/images/preview/hot-weibo-github-dark.png) | ![热搜 浅色](./docs/images/preview/hot-weibo-github-light.png) |
+| **历史上的今天**<br>`60s.历史` | ![历史 深色](./docs/images/preview/history-github-dark.png) | ![历史 浅色](./docs/images/preview/history-github-light.png) |
+| **摸鱼日历**<br>`60s.摸鱼` | ![摸鱼 深色](./docs/images/preview/moyu-github-dark.png) | ![摸鱼 浅色](./docs/images/preview/moyu-github-light.png) |
+
 ## 安装
 
 在 Koishi 插件市场搜索 `60s-vincentzyu`，或在 Koishi 根目录执行：
