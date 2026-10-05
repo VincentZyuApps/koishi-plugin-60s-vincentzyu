@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-60s-vincentzyu",
   "description": "📰 对接 60s 开放 API（https://github.com/vikiboss/60s），提供早报、热榜、天气与实用工具。🛠️",
-  "version": "0.2.1-alpha.3+20261005",
+  "version": "0.2.1-beta.1+20261006",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
