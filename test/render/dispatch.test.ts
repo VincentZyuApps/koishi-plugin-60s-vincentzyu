@@ -26,6 +26,10 @@ describe('render/dispatch', () => {
     await expect(renderReply({ logger: { error() {}, warn() {} } } as any, makeSession(), {} as any, makeConfig({ renderPreset: 'custom', customCommandOutput }), { text: '早报', kind: 'list', commandId: 'daily' })).rejects.toBeInstanceOf(OutputUnavailableError)
   })
 
+  it('关闭 enableOutputFallback 时通用预设不可用直接拒绝而不降级', async () => {
+    await expect(renderReply({ logger: { error() {}, warn() {} } } as any, makeSession(), {} as any, makeConfig({ enableOutputFallback: false }), { text: '文本', cardData, kind: 'list' })).rejects.toBeInstanceOf(OutputUnavailableError)
+  })
+
   it('临时模式不可用后继续使用预设规则', async () => {
     const result = await renderReply({ logger: { warn() {} } } as any, makeSession(), {} as any, makeConfig(), { text: '文本兜底', cardData, kind: 'single', modeOverride: 'image' })
     expect(result.mode).toBe('text')

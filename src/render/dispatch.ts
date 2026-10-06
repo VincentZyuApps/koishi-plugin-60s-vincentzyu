@@ -97,9 +97,16 @@ export async function renderReply(
   payload: RenderPayload,
   command?: string,
 ): Promise<RenderResult> {
+  const fallbackEnabled = config.enableOutputFallback ?? true
+
   if (payload.modeOverride) {
     const result = await renderWithMode(ctx, session, config, payload, payload.modeOverride, command)
     if (result) return result
+    if (!fallbackEnabled) {
+      const message = unavailableMessage(payload, payload.modeOverride)
+      ctx.logger.error(`[60s] 指定模式不可用且未开启回退 | command=${payload.commandId || '-'} | platform=${session.platform} | mode=${payload.modeOverride} | ${message}`)
+      throw new OutputUnavailableError(message)
+    }
   }
 
   const custom = config.renderPreset === RENDER_PRESET.CUSTOM
@@ -112,9 +119,11 @@ export async function renderReply(
   const result = await renderWithMode(ctx, session, config, payload, mode, command)
   if (result) return result
 
-  if (custom) {
+  // 1. 自定义模式：默认严格执行不降级；只有显式开启 enableOutputFallback 且为通用可回退项时才尝试回退
+  // 2. 通用/QQ预设：若用户显式关闭了 enableOutputFallback，则不可用时直接报错不降级
+  if (custom || !fallbackEnabled) {
     const message = unavailableMessage(payload, mode)
-    ctx.logger.error(`[60s] 自定义输出不可用 | command=${payload.commandId || '-'} | platform=${session.platform} | mode=${mode} | ${message}`)
+    ctx.logger.error(`[60s] 输出模式不可用 | command=${payload.commandId || '-'} | platform=${session.platform} | mode=${mode} | ${message}`)
     throw new OutputUnavailableError(message)
   }
 
