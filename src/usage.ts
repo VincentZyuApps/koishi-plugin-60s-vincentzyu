@@ -160,6 +160,26 @@ export const usage = `
 </details>
 
 <details>
+  <summary>📊 预设对比：通用预设 vs QQ 官方 Bot 预设</summary>
+  <div class="group-body">
+  <p>下表展示 <code>general</code>（通用预设）与 <code>qq-official</code>（QQ 官方 Bot 预设）在不同环境下的实际输出形式：</p>
+  <table>
+    <tr><th>指令 / 内容类型</th><th>📱 通用预设 (general)</th><th>🤖 QQ 预设 (qq-official) [QQ 官方 Bot]</th><th>🤖 QQ 预设 (qq-official) [其他平台]</th></tr>
+    <tr><td>📰 早报、历史、IT、AI、黑客新闻</td><td>Puppeteer 卡片图 <i>(无 Puppeteer 回退纯文本)</i></td><td>QQ 原生 Markdown <i>(带按钮，发送失败降级卡片图/文本)</i></td><td>Puppeteer 卡片图 <i>(自动按通用预设处理)</i></td></tr>
+    <tr><td>🔥 热搜榜 (微博/B站/知乎/抖音/百度等)</td><td>Puppeteer 卡片图 <i>(无 Puppeteer 回退纯文本)</i></td><td>QQ 原生 Markdown <i>(带按钮，发送失败降级卡片图/文本)</i></td><td>Puppeteer 卡片图 <i>(自动按通用预设处理)</i></td></tr>
+    <tr><td>🌤️ 天气、汇率、油价、金价</td><td>Puppeteer 卡片图 <i>(无 Puppeteer 回退纯文本)</i></td><td>QQ 原生 Markdown <i>(带按钮，发送失败降级卡片图/文本)</i></td><td>Puppeteer 卡片图 <i>(自动按通用预设处理)</i></td></tr>
+    <tr><td>🐟 摸鱼人日历、健康、猫眼、酷安</td><td>Puppeteer 卡片图 <i>(无 Puppeteer 回退纯文本)</i></td><td>QQ 原生 Markdown <i>(带按钮，发送失败降级卡片图/文本)</i></td><td>Puppeteer 卡片图 <i>(自动按通用预设处理)</i></td></tr>
+    <tr><td>🎵 歌词、IP 查询、密码、密码校验</td><td>Puppeteer 卡片图 <i>(无 Puppeteer 回退纯文本)</i></td><td>QQ 原生 Markdown <i>(带按钮，发送失败降级卡片图/文本)</i></td><td>Puppeteer 卡片图 <i>(自动按通用预设处理)</i></td></tr>
+    <tr><td>💬 一言、段子、笑话、发病、运势、答案</td><td>纯文本 <i>(可用 <code>-m card</code> 优先尝试卡片)</i></td><td>纯文本 <i>(可用 <code>-m card</code> 优先尝试卡片)</i></td><td>纯文本 <i>(可用 <code>-m card</code> 优先尝试卡片)</i></td></tr>
+    <tr><td>📚 百科、🈶 翻译</td><td>纯文本</td><td>纯文本</td><td>纯文本</td></tr>
+    <tr><td>🖼️ 早报 <code>-i</code> (官方原图)</td><td>直接发送图片</td><td>直接发送图片</td><td>直接发送图片</td></tr>
+    <tr><td>🔳 二维码、👤 QQ 资料</td><td>直接发送图片</td><td>直接发送图片</td><td>直接发送图片</td></tr>
+  </table>
+  <p>💡 <b>提示</b>：QQ 官方 Bot 原生 Markdown 发送失败时会自动按通用预设尝试回退；而 <code>custom</code>（自定义模式）则严格按单选项输出，格式不可用时会返回具体报错而不降级。</p>
+  </div>
+</details>
+
+<details>
   <summary>⏰ 定时任务与主动推送</summary>
   <div class="group-body">
   <p>需开启 <code>enableSchedule</code> 总开关且在配置表中启用对应行，插件才会按五段式 Cron 在 <code>scheduleTimezoneGmtOffset</code> 指定的 GMT 偏移执行。每行必须填写完整指令与 <code>platform</code>、<code>selfId</code>、<code>channelId</code>，任务会使用目标 Bot 的主动 Session 调用 <code>session.execute()</code>。</p>

@@ -1,9 +1,23 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { ColorMode, ImageTheme } from '../config'
 import type { TemplateName } from './themes'
 
-const TEMPLATES_DIR = path.resolve(__dirname, '../../templates')
+function resolveTemplatesDir(): string {
+  const candidates = [
+    path.resolve(__dirname, '../templates'),
+    path.resolve(__dirname, '../../templates'),
+    path.resolve(__dirname, 'templates'),
+  ]
+  for (const dir of candidates) {
+    if (existsSync(path.join(dir, 'common.css'))) {
+      return dir
+    }
+  }
+  return candidates[0]
+}
+
+const TEMPLATES_DIR = resolveTemplatesDir()
 
 const templateCache = new Map<string, string>()
 
