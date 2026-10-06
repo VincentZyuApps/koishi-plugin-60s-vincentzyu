@@ -24,7 +24,7 @@
 | **历史上的今天**<br>`60s.历史` | ![历史 深色](./docs/images/preview/history-github-dark.png) | ![历史 浅色](./docs/images/preview/history-github-light.png) |
 | **摸鱼日历**<br>`60s.摸鱼` | ![摸鱼 深色](./docs/images/preview/moyu-github-dark.png) | ![摸鱼 浅色](./docs/images/preview/moyu-github-light.png) |
 
-## 安装
+## 📦 安装
 
 在 Koishi 插件市场搜索 `60s-vincentzyu`，或在 Koishi 根目录执行：
 
@@ -35,9 +35,9 @@ npm install koishi-plugin-60s-vincentzyu
 
 插件需要 Koishi 的 `http` 服务。若要生成卡片图，请同时安装并启用 `koishi-plugin-puppeteer`。
 
-## 基础配置
+## ⚙️ 配置项
 
-### ⚙️ 基础
+### 🛠️ 基础设置
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ npm install koishi-plugin-60s-vincentzyu
 | `timeout` | `number` | `15000` | API 请求超时，单位毫秒 |
 | `commandPrefix` | `string` | `60s` | 指令前缀，例如 `60s.天气 上海` |
 
-### 🎨 渲染
+### 🎨 渲染设置
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ npm install koishi-plugin-60s-vincentzyu
 
 每条指令都可附加 `-m text|card|image|qq-markdown` 临时优先尝试一种输出；不可用时回到当前预设。
 
-## 输出预设
+#### 🖥️ 输出预设说明
 
 `general` 是默认预设：列表优先 Puppeteer 卡片图，单条内容优先文本，天然图片直接发送。卡片图不可用时会回退文本；早报有官方图时优先使用该图回退。
 
@@ -71,21 +71,21 @@ npm install koishi-plugin-60s-vincentzyu
 | 原始图片 | 直接发送图片 | `早报 -i`（官方早报图）、`二维码`、`QQ`（有头像时） |
 | 早报的无截图回退 | 直接发送官方早报图 | `早报`：有官方图且 Puppeteer 不可用时；官方图也不可用才回退文本 |
 
-### 📊 预设对比：通用预设 vs QQ 官方 Bot 预设
-
-| 指令 / 内容类型 | 📱 通用预设 (`general`) | 🤖 QQ 预设 (`qq-official`) [QQ 官方 Bot] | 🤖 QQ 预设 (`qq-official`) [其他平台] |
-| :--- | :--- | :--- | :--- |
-| **早报、历史、IT、AI、黑客新闻** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
-| **热搜榜** (微博/B站/知乎/抖音/百度等) | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
-| **天气、汇率、油价、金价** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
-| **摸鱼人日历、健康、猫眼、酷安** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
-| **歌词、IP 查询、密码、密码校验** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
-| **一言、段子、笑话、发病、运势、答案** | 纯文本 *(可用 `-m card` 优先尝试卡片)* | 纯文本 *(可用 `-m card` 优先尝试卡片)* | 纯文本 *(可用 `-m card` 优先尝试卡片)* |
-| **百科、翻译** | 纯文本 | 纯文本 | 纯文本 |
-| **早报 `-i`** (官方原图) | 直接发送图片 | 直接发送图片 | 直接发送图片 |
-| **二维码、QQ 资料** | 直接发送图片 | 直接发送图片 | 直接发送图片 |
-
-> [!TIP]
+> #### 📊 预设对比：通用预设 vs QQ 官方 Bot 预设
+>
+> | 指令 / 内容类型 | 📱 通用预设 (`general`) | 🤖 QQ 预设 (`qq-official`) [QQ 官方 Bot] | 🤖 QQ 预设 (`qq-official`) [其他平台] |
+> | :--- | :--- | :--- | :--- |
+> | **早报、历史、IT、AI、黑客新闻** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
+> | **热搜榜** (微博/B站/知乎/抖音/百度等) | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
+> | **天气、汇率、油价、金价** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
+> | **摸鱼人日历、健康、猫眼、酷安** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
+> | **歌词、IP 查询、密码、密码校验** | Puppeteer 卡片图 *(无 Puppeteer 回退纯文本)* | QQ 原生 Markdown *(带按钮，发送失败降级卡片图/文本)* | Puppeteer 卡片图 *(自动按通用预设处理)* |
+> | **一言、段子、笑话、发病、运势、答案** | 纯文本 *(可用 `-m card` 优先尝试卡片)* | 纯文本 *(可用 `-m card` 优先尝试卡片)* | 纯文本 *(可用 `-m card` 优先尝试卡片)* |
+> | **百科、翻译** | 纯文本 | 纯文本 | 纯文本 |
+> | **早报 `-i`** (官方原图) | 直接发送图片 | 直接发送图片 | 直接发送图片 |
+> | **二维码、QQ 资料** | 直接发送图片 | 直接发送图片 | 直接发送图片 |
+>
+> 💡 **提示与补充**：
 > 1. 每条指令均支持在触发时附加 `-m <text|card|image|qq-markdown>` 临时优先尝试指定格式，若该格式在当前环境不可用则自动按预设规则处理。
 > 2. `custom`（自定义命令输出模式）严格按照控制台单选项执行，所选格式不可用时会向会话返回明确错误提示，不执行静默降级。
 
@@ -129,13 +129,13 @@ npm install koishi-plugin-60s-vincentzyu
 
 管理员可执行 `60s.定时任务状态` 查看运行状态，或执行 `60s.定时任务执行` 立即运行全部已启用任务。启用 Koishi Console 后，插件详情也提供“刷新状态”和“立即执行全部启用任务”按钮；后者会真实发送消息并要求确认。
 
-### 🔍 调试
+### 🔍 调试设置
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `verboseConsoleLog` | `boolean` | `false` | 输出请求 URL、状态码、耗时和响应摘要等调试日志 |
 
-## 常用命令
+## 🚀 常用命令
 
 ```text
 60s                 查看插件入口与常用指令
@@ -154,6 +154,6 @@ npm install koishi-plugin-60s-vincentzyu
 
 更多参数可使用 `60s.xxx --help` 查看。
 
-## 测试
+## 🧪 自动化测试
 
 测试命令、真实 API 冒烟和全指令文本/截图验收说明见 [test/README.md](./test/README.md)。真实验收会写入被 Git 忽略的 `output/runs/`，每轮都有可直接查看的文本、图片与 Markdown 报告。
