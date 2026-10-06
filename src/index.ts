@@ -65,7 +65,7 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session }) => {
       const { timezoneGmtOffset, tasks } = scheduledTasks.getStatus()
       const lines = [
-        `⏰ 60s 定时任务 | GMT${timezoneGmtOffset >= 0 ? '+' : ''}${timezoneGmtOffset}`,
+        `⏰ 60s 定时任务 | 总开关：${config.enableSchedule ? '已开启' : '已关闭'} | GMT${timezoneGmtOffset >= 0 ? '+' : ''}${timezoneGmtOffset}`,
         ...tasks.map((task) => `${task.enabled ? '✅' : '⏸️'} ${task.name || `任务 ${task.index + 1}`} | ${task.cron} | ${task.registered ? '已注册' : '未注册'} | 连续失败 ${task.consecutiveFailures}${task.lastMessage ? `\n   ${task.lastMessage}` : ''}`),
       ]
       await session.send(`${config.enableQuote ? h.quote(session.messageId) : ''}${h.text(lines.join('\n'))}`)

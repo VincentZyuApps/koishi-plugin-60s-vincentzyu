@@ -98,6 +98,7 @@ npm install koishi-plugin-60s-vincentzyu
 
 | 配置项 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
+| `enableSchedule` | `boolean` | `false` | 是否开启 Cron 定时任务总开关；关闭时不注册后台定时器 |
 | `scheduleTimezoneGmtOffset` | `number` | `8` | Cron 使用的 GMT 偏移，范围 `-12` 至 `14`，默认 GMT+8 |
 | `scheduledTasks` | `ScheduledTaskConfig[]` | 5 条禁用示例 | 通用主动推送任务表 |
 | `scheduledTasks[].name` | `string` | 示例任务名 | 任务显示名称 |

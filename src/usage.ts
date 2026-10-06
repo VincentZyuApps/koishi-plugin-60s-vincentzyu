@@ -139,6 +139,7 @@ export const usage = `
   <li><b>renderPreset</b>：选择通用预设、QQ 官方 Bot 预设或逐命令严格自定义</li>
   <li><b>QQ 官方 Bot Markdown</b>：QQ 官方 Bot 预设中的列表原生 Markdown，按钮发送方式可单选</li>
   <li><b>Puppeteer 卡片图</b>：安装 koishi-plugin-puppeteer 后可渲染精美卡片图</li>
+  <li><b>enableSchedule</b>：定时任务总开关，默认关闭，开启后才会注册并运行后台调度</li>
   <li><b>定时任务</b>：按固定 GMT 偏移执行完整 Koishi 指令，并独立指定 platform / selfId / channelId</li>
   <li><b>--mode / -m</b>：每条命令可临时优先尝试输出方式（text / card / image / qq-markdown）</li>
 </ul>
@@ -161,7 +162,7 @@ export const usage = `
 <details>
   <summary>⏰ 定时任务与主动推送</summary>
   <div class="group-body">
-  <p>在配置表中启用任务后，插件会按五段式 Cron 在 <code>scheduleTimezoneGmtOffset</code> 指定的 GMT 偏移执行。每行必须填写完整指令与 <code>platform</code>、<code>selfId</code>、<code>channelId</code>，任务会使用目标 Bot 的主动 Session 调用 <code>session.execute()</code>。</p>
+  <p>需开启 <code>enableSchedule</code> 总开关且在配置表中启用对应行，插件才会按五段式 Cron 在 <code>scheduleTimezoneGmtOffset</code> 指定的 GMT 偏移执行。每行必须填写完整指令与 <code>platform</code>、<code>selfId</code>、<code>channelId</code>，任务会使用目标 Bot 的主动 Session 调用 <code>session.execute()</code>。</p>
   <p>默认提供每日早报、上海天气、历史上的今天、B 站热搜和 IT 之家热榜五条禁用示例。连续失败 3 次仅提醒目标一次；任意成功即重置计数。管理员可执行 <code>60s.定时任务状态</code> 或 <code>60s.定时任务执行</code>，Console 插件详情也提供状态和立即执行按钮。</p>
   </div>
 </details>

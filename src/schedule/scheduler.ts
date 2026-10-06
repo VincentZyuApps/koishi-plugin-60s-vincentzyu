@@ -55,6 +55,10 @@ export class ScheduledTaskService {
     this.stop()
     const timezone = timezoneFromGmtOffset(this.config.scheduleTimezoneGmtOffset)
     this.statuses = this.config.scheduledTasks.map((task, index) => this.createStatus(task, index))
+    if (!this.config.enableSchedule) {
+      this.ctx.logger.debug?.('[60s] 定时任务总开关未开启 (enableSchedule=false)')
+      return
+    }
 
     this.config.scheduledTasks.forEach((task, index) => {
       const status = this.statuses[index]
@@ -84,8 +88,9 @@ export class ScheduledTaskService {
     for (const status of this.statuses) status.registered = false
   }
 
-  getStatus(): { timezoneGmtOffset: number, tasks: ScheduledTaskStatus[] } {
+  getStatus(): { enableSchedule: boolean, timezoneGmtOffset: number, tasks: ScheduledTaskStatus[] } {
     return {
+      enableSchedule: !!this.config.enableSchedule,
       timezoneGmtOffset: this.config.scheduleTimezoneGmtOffset,
       tasks: this.statuses.map((status) => ({ ...status })),
     }

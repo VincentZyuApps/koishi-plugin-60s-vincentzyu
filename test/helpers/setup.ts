@@ -69,6 +69,7 @@ export function makeConfig(overrides: any = {}) {
     colorMode: 'system',
     fontMode: 'npm-lxgw',
     customFontPath: '',
+    enableSchedule: false,
     scheduleTimezoneGmtOffset: 8,
     scheduledTasks: [],
     verboseConsoleLog: false,

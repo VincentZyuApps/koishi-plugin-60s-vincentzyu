@@ -59,9 +59,27 @@ describe('schedule/scheduler', () => {
     expect(service.getStatus().tasks[0].consecutiveFailures).toBe(0)
   })
 
+  it('does not register enabled tasks when enableSchedule is false', () => {
+    const ctx = makeContext()
+    const service = new ScheduledTaskService(ctx as any, makeConfig({ enableSchedule: false, scheduledTasks: [task] }))
+    service.start()
+    expect(service.getStatus().enableSchedule).toBe(false)
+    expect(service.getStatus().tasks[0].registered).toBe(false)
+    service.stop()
+  })
+
+  it('registers enabled tasks when enableSchedule is true', () => {
+    const ctx = makeContext()
+    const service = new ScheduledTaskService(ctx as any, makeConfig({ enableSchedule: true, scheduledTasks: [task] }))
+    service.start()
+    expect(service.getStatus().enableSchedule).toBe(true)
+    expect(service.getStatus().tasks[0].registered).toBe(true)
+    service.stop()
+  })
+
   it('does not register enabled tasks with incomplete targets', () => {
     const ctx = makeContext()
-    const service = new ScheduledTaskService(ctx as any, makeConfig({ scheduledTasks: [{ ...task, channelId: '' }] }))
+    const service = new ScheduledTaskService(ctx as any, makeConfig({ enableSchedule: true, scheduledTasks: [{ ...task, channelId: '' }] }))
     service.start()
     expect(service.getStatus().tasks[0]).toMatchObject({ registered: false, lastResult: 'skipped' })
     service.stop()

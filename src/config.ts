@@ -94,6 +94,7 @@ export interface Config {
   fontMode: FontMode
   customFontPath: string
   // ⏰ 定时任务
+  enableSchedule: boolean
   scheduleTimezoneGmtOffset: number
   scheduledTasks: ScheduledTaskConfig[]
   // 🔍 调试
@@ -161,7 +162,7 @@ export const Config = Schema.intersect([
         '🎨 选择插件的默认输出策略。',
         '<i><code>【通用预设】</code>列表优先卡片图，单条内容纯文本，天然图片直接发送。</i>',
         '<i><code>【QQ 官方 Bot 预设】</code>QQ 官方 Bot 的列表优先原生 Markdown；其他平台按通用预设输出。</i>',
-        '<i><code>【自定义命令输出】</code>严格按底部每条规范命令的选择执行；所选格式不可用时会返回错误，不自动降级。</i>',
+        '<i><code>【自定义命令输出】</code>仅在此预设生效。严格按底部每条规范命令的选择执行；中文与英文 alias 共用同一项。卡片图、直接图片或 QQ 原生 Markdown 不可用时会返回简洁错误并在控制台记录详细原因，不自动降级。</i>',
         '💡 每条指令可用 <code>-m/--mode &lt;text|card|image|qq-markdown&gt;</code> 临时优先尝试一种输出；失败后回到本预设规则。',
       ].join('<br/>')),
     enableQuote: Schema.boolean()
@@ -268,6 +269,9 @@ export const Config = Schema.intersect([
 
   // ⏰ 定时任务
   Schema.object({
+    enableSchedule: Schema.boolean()
+      .default(false)
+      .description('⏰ 是否开启 Cron 定时任务。默认关闭，开启后才会按配置注册后台定时器。'),
     scheduleTimezoneGmtOffset: Schema.number()
       .min(-12)
       .max(14)
@@ -295,12 +299,8 @@ export const Config = Schema.intersect([
   // ⚙️ 自定义指令输出
   Schema.object({
     customCommandOutput: customCommandOutputSchema
-      .default(DEFAULT_CUSTOM_COMMAND_OUTPUT)
-      .description([
-        '⚙️ 仅在上方选择「自定义命令输出」时生效。所有中文和英文 alias 共用同一项。',
-        '⚠️ 此模式严格执行：卡片图、直接图片或 QQ 原生 Markdown 不可用时会返回简洁错误；详细原因记录在控制台。',
-      ].join('<br/>')),
-  }).description('⚙️ 自定义指令输出'),
+      .default(DEFAULT_CUSTOM_COMMAND_OUTPUT),
+  }).description('⚙️ 自定义指令输出（仅选择自定义预设时生效；格式不可用时不自动降级）'),
 
   // 🔍 调试
   Schema.object({

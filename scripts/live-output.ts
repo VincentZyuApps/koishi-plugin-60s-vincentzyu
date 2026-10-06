@@ -349,7 +349,7 @@ export async function main() {
     const config: Config = {
       baseUrl, timeout: 30_000, commandPrefix: '60s', renderPreset: 'general', customCommandOutput: { ...DEFAULT_CUSTOM_COMMAND_OUTPUT }, enableQuote: false, enableWaitingHint: false,
       qqMarkdownKeyboardJson: '{}', qqMarkdownButtonMode: 'append-to-markdown', imageType: 'png', screenshotQuality: 88, imageWidth: 760,
-      imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', scheduleTimezoneGmtOffset: 8, scheduledTasks: [], verboseConsoleLog: false,
+      imageTheme: options.imageTheme || 'koishi', colorMode: options.colorMode || 'light', fontMode: 'npm-lxgw', customFontPath: '', enableSchedule: false, scheduleTimezoneGmtOffset: 8, scheduledTasks: [], verboseConsoleLog: false,
     }
     await apply(ctx, config)
     const theme = options.imageTheme
