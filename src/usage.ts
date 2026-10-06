@@ -137,6 +137,7 @@ export const usage = `
   <li><b>baseUrl</b>：60s API 地址，默认 <code>http://127.0.0.1:4399</code>；使用远端服务时请自行填写可用实例</li>
   <li><b>上游仓库</b>：<a href="https://github.com/vikiboss/60s">https://github.com/vikiboss/60s</a></li>
   <li><b>renderPreset</b>：选择通用预设、QQ 官方 Bot 预设或逐命令严格自定义</li>
+  <li><b>enableOutputFallback</b>：选择的形式不可用时是否自动降级回退（如卡片/Markdown 失败降级文本），默认开启；关闭时严格报错</li>
   <li><b>QQ 官方 Bot Markdown</b>：QQ 官方 Bot 预设中的列表原生 Markdown，按钮发送方式可单选</li>
   <li><b>Puppeteer 卡片图</b>：安装 koishi-plugin-puppeteer 后可渲染精美卡片图</li>
   <li><b>enableSchedule</b>：定时任务总开关，默认关闭，开启后才会注册并运行后台调度</li>

@@ -51,6 +51,7 @@ npm install koishi-plugin-60s-vincentzyu
 | --- | --- | --- | --- |
 | `renderPreset` | `general` / `qq-official` / `custom` | `general` | 全局输出预设；通用、QQ 官方 Bot 或逐命令严格自定义 |
 | `customCommandOutput.<命令>` | `text` / `card` / `image` / `qq-markdown` | 按命令类型 | 仅 `custom` 生效；每条规范命令以控制台单选项配置，格式不可用时严格报错 |
+| `enableOutputFallback` | `boolean` | `true` | 是否在所选输出形式不可用时自动回退降级（如卡片/Markdown 失败降级文本）；关闭则严格报错。*(实验性)* |
 | `enableQuote` | `boolean` | `true` | 是否引用触发命令的消息 |
 | `enableWaitingHint` | `boolean` | `true` | 是否发送并自动撤回“获取中”提示 |
 

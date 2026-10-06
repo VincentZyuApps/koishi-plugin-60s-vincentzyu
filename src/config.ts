@@ -80,6 +80,7 @@ export interface Config {
   // 🎨 渲染
   renderPreset: RenderPreset
   customCommandOutput: CustomCommandOutput
+  enableOutputFallback: boolean
   enableQuote: boolean
   enableWaitingHint: boolean
   // 🤖 QQ官方bot
@@ -165,6 +166,13 @@ export const Config = Schema.intersect([
         '<i><code>【自定义命令输出】</code>仅在此预设生效。严格按底部每条规范命令的选择执行；中文与英文 alias 共用同一项。卡片图、直接图片或 QQ 原生 Markdown 不可用时会返回简洁错误并在控制台记录详细原因，不自动降级。</i>',
         '💡 每条指令可用 <code>-m/--mode &lt;text|card|image|qq-markdown&gt;</code> 临时优先尝试一种输出；失败后回到本预设规则。',
       ].join('<br/>')),
+    enableOutputFallback: Schema.boolean()
+      .default(true)
+      .description([
+        '🔄 是否在所选输出形式不可用时自动回退降级（例如 卡片图/Markdown 失败时降级为纯文本）。',
+        '关闭后将严格执行所选输出；若不可用则直接报错提示，不降级。',
+      ].join('<br/>'))
+      .experimental(),
     enableQuote: Schema.boolean()
       .default(true)
       .description('💬 是否引用触发指令的消息。'),
