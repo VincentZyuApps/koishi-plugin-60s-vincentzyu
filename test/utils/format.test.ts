@@ -66,6 +66,27 @@ describe('utils/format', () => {
       expect(result).toContain('1. 最新新闻标题')
       expect(result).not.toContain('undefined')
     })
+
+    it('strips leading order numbers from raw news titles to avoid duplicate numbering', () => {
+      const result = formatDaily({
+        date: '2026-10-06', day_of_week: '星期二', lunar_date: '八月廿七',
+        news: [
+          '1. 国庆假期第 5 日：全社会跨区域人员流动量预计 3.06 亿人次',
+          '2. “黄金睡眠时长” 出炉',
+          '10. 2026 年诺贝尔生理学或医学奖揭晓',
+          '15、 韩国公布地雷调查',
+        ],
+        tip: '每日微语', image: '', link: '', cover: '',
+        updated: '', updated_at: 0, api_updated: '', api_updated_at: 0,
+      })
+      expect(result).toContain('1. 国庆假期第 5 日：全社会跨区域人员流动量预计 3.06 亿人次')
+      expect(result).toContain('2. “黄金睡眠时长” 出炉')
+      expect(result).toContain('3. 2026 年诺贝尔生理学或医学奖揭晓')
+      expect(result).toContain('4. 韩国公布地雷调查')
+      expect(result).not.toContain('1. 1.')
+      expect(result).not.toContain('2. 2.')
+      expect(result).not.toContain('3. 10.')
+    })
   })
 
   describe('formatWeibo', () => {

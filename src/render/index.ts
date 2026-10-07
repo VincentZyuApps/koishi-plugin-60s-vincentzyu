@@ -114,7 +114,7 @@ export async function renderDailyCard(ctx: Context, config: Config, data: Daily6
   return renderCard(ctx, config, {
     title: `${data.date} ${data.day_of_week}`,
     subtitle: data.tip || '每日微语',
-    items: data.news.map((n, i) => ({ text: `${i + 1}. ${getDailyNewsTitle(n)}` })),
+    items: data.news.map((n) => ({ text: getDailyNewsTitle(n) })),
     footer: `60s API · ${data.lunar_date}`,
   }, 'daily')
 }

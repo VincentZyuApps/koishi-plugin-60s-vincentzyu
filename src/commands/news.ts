@@ -25,7 +25,7 @@ export async function registerNewsCommands(ctx: Context, config: Config, client:
         let payload = cardPayload({
           title: `${data.date} ${data.day_of_week}`,
           subtitle: data.tip || '每日微语',
-          items: data.news.map((n, i) => ({ text: `${i + 1}. ${getDailyNewsTitle(n)}` })),
+          items: data.news.map((n) => ({ text: getDailyNewsTitle(n) })),
           footer: `60s API · ${data.lunar_date}`,
         }, 'daily', 'list')
         payload = { ...payload, text, markdown: text }
