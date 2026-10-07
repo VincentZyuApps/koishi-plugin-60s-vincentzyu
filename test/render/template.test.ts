@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { buildCardHtml, buildListItems, fillTemplate, loadCommonCss, loadTemplate } from '../../src/render/template-loader'
+import { buildCardHtml, buildListItems, fillTemplate, loadCommonCss, loadTemplate } from '../../src/render/template'
 
-describe('render/template-loader', () => {
+describe('render/template', () => {
   it('loads all template files', () => {
     for (const name of ['daily', 'hot', 'weather', 'simple', 'media']) {
       const html = loadTemplate(name)

@@ -190,8 +190,21 @@ export function formatGoldPrice(data: GoldPrice): string {
 
 // ==================== 日历 ====================
 
+/** 将历史上的今天日期格式化为前导0的「xx月xx日」形式，例如 10-7 -> 10月07日，8-5 -> 08月05日 */
+export function formatHistoryDate(data: Pick<TodayInHistory, 'date'> & Partial<Pick<TodayInHistory, 'month' | 'day'>>): string {
+  if (data.month && data.day) {
+    return `${String(data.month).padStart(2, '0')}月${String(data.day).padStart(2, '0')}日`
+  }
+  const match = String(data.date || '').match(/^(\d{1,2})[-/.月](\d{1,2})日?$/)
+  if (match) {
+    return `${match[1].padStart(2, '0')}月${match[2].padStart(2, '0')}日`
+  }
+  return data.date
+}
+
 export function formatTodayInHistory(data: TodayInHistory): string {
-  const lines = [`📜 ${data.date} 历史上的今天`, '']
+  const dateStr = formatHistoryDate(data)
+  const lines = [`📜 ${dateStr} 历史上的今天`, '']
   data.items.slice(0, 10).forEach((item) => {
     lines.push(`· ${item.year} ${item.title}`)
   })

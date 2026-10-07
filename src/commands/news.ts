@@ -2,7 +2,7 @@ import type { Context } from 'koishi'
 import type { Config } from '../config'
 import type { Client } from '../client'
 import { addModeOption, cardPayload, safeAction, sendReply, withMode } from './helper'
-import { formatDaily, formatTodayInHistory, getDailyNewsTitle } from '../utils/format'
+import { formatDaily, formatHistoryDate, formatTodayInHistory, getDailyNewsTitle } from '../utils/format'
 
 export async function registerNewsCommands(ctx: Context, config: Config, client: Client) {
   const base = config.commandPrefix
@@ -43,8 +43,9 @@ export async function registerNewsCommands(ctx: Context, config: Config, client:
       await safeAction(ctx, session, async () => {
         const data = await client.getTodayInHistory(date || options.date)
         const text = formatTodayInHistory(data)
+        const dateStr = formatHistoryDate(data)
         const payload = withMode(cardPayload({
-          title: `${data.date} 历史上的今天`,
+          title: `${dateStr} 历史上的今天`,
           items: data.items.slice(0, 15).map((item) => ({ text: `${item.year} ${item.title}` })),
           footer: '60s API',
         }, 'hot', 'list'), options, 'history')

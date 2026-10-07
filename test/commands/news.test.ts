@@ -104,6 +104,7 @@ describe('commands/news', () => {
       await reg!.action!({ session, options: {} }, undefined)
       expect(client.getTodayInHistory).toHaveBeenCalled()
       const sent = session.send.mock.calls[0][0]
+      expect(sent).toContain('08月07日 历史上的今天')
       expect(sent).toContain('1945 大事件')
     })
   })
