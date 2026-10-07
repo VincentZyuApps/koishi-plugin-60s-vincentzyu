@@ -6,6 +6,7 @@ import {
   formatExchangeRate,
   formatGenericHot,
   formatHackerNews,
+  formatHistoryDate,
   formatITNews,
   formatLyric,
   formatMoyu,
@@ -171,13 +172,20 @@ describe('utils/format', () => {
     })
   })
 
-  describe('formatTodayInHistory', () => {
-    it('formats history items', () => {
+  describe('formatHistoryDate & formatTodayInHistory', () => {
+    it('formats history date with leading zeros as xx月xx日', () => {
+      expect(formatHistoryDate({ date: '10-7', month: 10, day: 7 })).toBe('10月07日')
+      expect(formatHistoryDate({ date: '8-5', month: 8, day: 5 })).toBe('08月05日')
+      expect(formatHistoryDate({ date: '10-7' })).toBe('10月07日')
+      expect(formatHistoryDate({ date: '8-5' })).toBe('08月05日')
+    })
+
+    it('formats history items with formatted date', () => {
       const result = formatTodayInHistory({
-        date: '8-7', month: 8, day: 7,
+        date: '10-7', month: 10, day: 7,
         items: [{ title: '大事件', year: '1945', description: '', event_type: 'event', link: '' }],
       } as any)
-      expect(result).toContain('8-7')
+      expect(result).toContain('10月07日 历史上的今天')
       expect(result).toContain('1945 大事件')
     })
   })

@@ -1,7 +1,7 @@
 import type { Context } from 'koishi'
 import type { Config } from '../config'
 import type { Daily60s } from '../types'
-import { buildCardHtml, buildListItems, escapeHtml, type CardBuildOptions } from './template-loader'
+import { buildCardHtml, buildListItems, escapeHtml, type CardBuildOptions } from './template'
 import type { CardData, CardTemplate } from './dispatch'
 import { resolveCardFontCss } from '../utils/font'
 import { getDailyNewsTitle } from '../utils/format'
