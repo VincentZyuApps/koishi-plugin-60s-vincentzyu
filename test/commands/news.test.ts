@@ -65,6 +65,28 @@ describe('commands/news', () => {
       expect(sent).toContain('<image')
       expect(sent).toContain('http://img/60s.png')
     })
+
+    it('passes cleaned item texts to card payload without duplicate numbering', async () => {
+      const { ctx, registrations } = mockCommandContext()
+      const client = makeClient({
+        getDaily: vi.fn().mockResolvedValue({
+          date: '2026-10-06', day_of_week: '星期二', lunar_date: '八月廿七',
+          news: ['1. 新闻一', '2. 新闻二'], tip: '每日微语', image: '',
+          link: '', cover: '', updated: '', updated_at: 0, api_updated: '', api_updated_at: 0,
+        }),
+      })
+      await registerNewsCommands(ctx, makeConfig(), client)
+      const reg = registrations.find((r) => r.primary === '60s.早报')
+      const session = makeSession()
+      await reg!.action!({ session, options: {} }, undefined)
+
+      expect(session.send).toHaveBeenCalled()
+      const sent = session.send.mock.calls[0][0]
+      // 默认在没有 puppeteer 时回退到 text，text 包含有序编号且序号不重复
+      expect(sent).toContain('1. 新闻一')
+      expect(sent).toContain('2. 新闻二')
+      expect(sent).not.toContain('1. 1. 新闻一')
+    })
   })
 
   describe('60s.历史', () => {

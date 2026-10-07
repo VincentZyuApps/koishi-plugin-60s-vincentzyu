@@ -41,9 +41,12 @@ function formatHotList(items: Array<{ title: string; hot?: number | string; link
 
 // ==================== 核心 ====================
 
-/** 兼容 60s v2 的字符串新闻项与旧实例的 { title, link } 新闻项。 */
+const LEADING_INDEX_RE = /^(?:(?:\d+\.(?!\d)|\d+、|\(\d+\)|（\d+）|[①-⑳]))\s*/
+
+/** 兼容 60s v2 的字符串新闻项与旧实例的 { title, link } 新闻项，并清理文本自带的前置序号。 */
 export function getDailyNewsTitle(item: Daily60s['news'][number]): string {
-  return typeof item === 'string' ? item : item.title
+  const raw = typeof item === 'string' ? item : item.title
+  return raw.replace(LEADING_INDEX_RE, '')
 }
 
 export function formatDaily(data: Daily60s): string {
