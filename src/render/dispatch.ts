@@ -19,6 +19,8 @@ export interface CardData {
   title: string
   subtitle?: string
   items?: Array<{ text: string; hot?: string | number }>
+  /** 内部渲染标记：隐藏列表序号，当前仅摸鱼卡片使用。 */
+  hideRank?: boolean
   body?: string
   temp?: string
   infoLines?: string[]

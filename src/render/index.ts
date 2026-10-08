@@ -35,7 +35,7 @@ export function renderCardToHtml(data: CardData, config: Config, template: CardT
     return buildCardHtml('daily', {
       title: data.title,
       subtitle: data.subtitle ?? '',
-      items_html: data.items ? buildListItems(data.items, 1) : '',
+      items_html: data.items ? buildListItems(data.items, 1, { showRank: !data.hideRank }) : '',
       footer: data.footer ?? '',
     }, options)
   }
@@ -44,7 +44,7 @@ export function renderCardToHtml(data: CardData, config: Config, template: CardT
     return buildCardHtml('hot', {
       title: data.title,
       subtitle: data.subtitle ?? '',
-      items_html: data.items ? buildListItems(data.items, 1) : '',
+      items_html: data.items ? buildListItems(data.items, 1, { showRank: !data.hideRank }) : '',
       footer: data.footer ?? '',
     }, options)
   }

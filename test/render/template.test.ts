@@ -42,6 +42,14 @@ describe('render/template', () => {
     expect(html).toContain('top2')
   })
 
+  it('builds list items without ranks when hidden', () => {
+    const html = buildListItems([{ text: '🏖️ 周末' }, { text: '📊 本周进度' }], 1, { showRank: false })
+    expect(html).toContain('list-line no-rank')
+    expect(html).toContain('🏖️ 周末')
+    expect(html).toContain('📊 本周进度')
+    expect(html).not.toContain('list-rank')
+  })
+
   it('appends configured card font css', () => {
     const html = buildCardHtml('simple', {
       title: '字体测试',

@@ -153,6 +153,10 @@ body {
   border-bottom: none;
 }
 
+.list-line.no-rank {
+  gap: 0;
+}
+
 .list-rank {
   flex-shrink: 0;
   width: 26px;
