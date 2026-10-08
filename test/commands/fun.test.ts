@@ -91,4 +91,39 @@ describe('commands/fun', () => {
     expect(client.getMoyu).toHaveBeenCalled()
     expect(session.send.mock.calls.map((c) => c[0]).join(' ')).toContain('71%')
   })
+
+  it('摸鱼 keeps emoji and hides card ranks', async () => {
+    const moyu = {
+      date: { gregorian: '2026-08-07', weekday: '星期五', dayOfWeek: 5, lunar: {} },
+      today: { isWeekend: false, isHoliday: false, isWorkday: true, holidayName: null, solarTerm: null, lunarFestivals: [] },
+      progress: { week: { passed: 5, total: 7, remaining: 2, percentage: 71 }, month: { passed: 7, total: 31, remaining: 24, percentage: 23 }, year: { passed: 219, total: 365, remaining: 146, percentage: 60 } },
+      currentHoliday: null,
+      nextHoliday: null,
+      nextWeekend: null,
+      countdown: { toWeekEnd: 2, toFriday: 0, toMonthEnd: 24, toYearEnd: 146 },
+      moyuQuote: '摸鱼快乐',
+    }
+    const { ctx, registrations } = mockCommandContext()
+    const client = makeClient({ getMoyu: vi.fn().mockResolvedValue(moyu) })
+    let html = ''
+    ctx.puppeteer = {
+      page: () => ({
+        setContent: vi.fn(async (content: string) => { html = content }),
+        waitForSelector: vi.fn(async () => null),
+        evaluate: vi.fn(async () => null),
+        $: vi.fn(async () => ({ screenshot: vi.fn(async () => 'mock-base64') })),
+        close: vi.fn(async () => null),
+      }),
+    }
+    await registerFunCommands(ctx, makeConfig({ fontMode: 'system-default' }), client)
+    const reg = registrations.find((r) => r.primary === '60s.摸鱼')
+    const session = makeSession()
+    await reg!.action!({ session, options: {} }, ...[])
+
+    expect(html).toContain('list-line no-rank')
+    expect(html).toContain('🏖️ 周末')
+    expect(html).toContain('📊 本周进度')
+    expect(html).toContain('💬 摸鱼快乐')
+    expect(html).not.toContain('<span class="list-rank')
+  })
 })

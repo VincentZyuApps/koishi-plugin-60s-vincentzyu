@@ -84,16 +84,25 @@ export function buildCardHtml(
 }
 
 /** 列表项 → 循环 HTML（Top3 高亮） */
+export interface BuildListItemsOptions {
+  /** 是否渲染前置序号，默认显示。 */
+  showRank?: boolean
+}
+
 export function buildListItems(
   items: Array<{ text: string; hot?: string | number }>,
   start = 1,
+  options: BuildListItemsOptions = {},
 ): string {
   return items
     .map((item, i) => {
       const rank = start + i
       const topClass = rank === 1 ? ' top1' : rank === 2 ? ' top2' : rank === 3 ? ' top3' : ''
       const hot = item.hot !== undefined ? `<span class="list-hot">🔥${item.hot}</span>` : ''
-      return `<div class="list-line"><span class="list-rank${topClass}">${rank}</span><span class="list-text">${escapeHtml(item.text)}</span>${hot}</div>`
+      const rankHtml = options.showRank === false
+        ? ''
+        : `<span class="list-rank${topClass}">${rank}</span>`
+      return `<div class="list-line${options.showRank === false ? ' no-rank' : ''}">${rankHtml}<span class="list-text">${escapeHtml(item.text)}</span>${hot}</div>`
     })
     .join('')
 }

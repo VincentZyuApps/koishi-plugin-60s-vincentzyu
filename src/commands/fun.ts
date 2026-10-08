@@ -113,7 +113,8 @@ export async function registerFunCommands(ctx: Context, config: Config, client: 
         const payload = withMode(cardPayload({
           title: `🐟 ${data.date.gregorian} ${data.date.weekday}`,
           subtitle: '摸鱼进度',
-          items: lines.slice(1).map((l) => ({ text: l.replace(/^[📊🎯🏖️🎉💬]\s*/, '') })),
+          items: lines.slice(1).map((l) => ({ text: l })),
+          hideRank: true,
           footer: '60s API',
         }, 'hot', 'list'), options, 'moyu')
         await sendReply(ctx, session, client, config, { ...payload, text })
