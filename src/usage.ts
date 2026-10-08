@@ -104,7 +104,6 @@ export const usage = `
 <div class="s60s-usage">
 <h1>📰 60s API 插件</h1>
 <p>
-  <!--
   <a href="https://www.npmjs.com/package/koishi-plugin-60s-vincentzyu" target="_blank">
     <img src="https://img.shields.io/npm/v/koishi-plugin-60s-vincentzyu?style=flat-square&logo=npm" alt="npm version">
   </a>
@@ -112,7 +111,6 @@ export const usage = `
     <img src="https://img.shields.io/npm/dm/koishi-plugin-60s-vincentzyu?style=flat-square&logo=npm" alt="npm downloads">
   </a>
   <br>
-  -->
   <a href="https://github.com/VincentZyuApps/koishi-plugin-60s-vincentzyu" target="_blank">
     <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
@@ -120,11 +118,9 @@ export const usage = `
     <img src="https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white" alt="Gitee">
   </a>
   <br>
-  <!--
-  <a href="https://forum.koishi.xyz/t/topic/xxxxx" target="_blank">
-    <img src="https://img.shields.io/badge/Koishi%20Forum-xxxxx-5546A3?style=for-the-badge&logo=${KOISHI_LOGO_BASE64}&logoColor=white" alt="Koishi Forum">
+  <a href="https://forum.koishi.xyz/t/topic/13724" target="_blank">
+    <img src="https://img.shields.io/badge/Koishi%20Forum-13724-5546A3?style=for-the-badge&logo=${KOISHI_LOGO_BASE64}&logoColor=white" alt="Koishi Forum">
   </a>
-  -->
   <a href="https://qm.qq.com/q/ZHj33L5cuC" target="_blank">
     <img src="https://img.shields.io/badge/QQ群-1085190201-12B7F5?style=flat-square&logo=qq&logoColor=white" alt="QQ群">
   </a>
