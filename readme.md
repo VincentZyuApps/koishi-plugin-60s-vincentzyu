@@ -24,11 +24,11 @@
 
 | 功能模块 | 深色模式（Dark） | 浅色模式（Light） |
 | :--- | :---: | :---: |
-| **每日早报**<br>`60s.早报` | ![早报 深色](./docs/images/preview/daily-github-dark.png) | ![早报 浅色](./docs/images/preview/daily-github-light.png) |
-| **实时天气**<br>`60s.天气 上海` | ![天气 深色](./docs/images/preview/weather-github-dark.png) | ![天气 浅色](./docs/images/preview/weather-github-light.png) |
-| **微博热搜**<br>`60s.热榜 weibo` | ![热搜 深色](./docs/images/preview/hot-weibo-github-dark.png) | ![热搜 浅色](./docs/images/preview/hot-weibo-github-light.png) |
-| **历史上的今天**<br>`60s.历史` | ![历史 深色](./docs/images/preview/history-github-dark.png) | ![历史 浅色](./docs/images/preview/history-github-light.png) |
-| **摸鱼日历**<br>`60s.摸鱼` | ![摸鱼 深色](./docs/images/preview/moyu-github-dark.png) | ![摸鱼 浅色](./docs/images/preview/moyu-github-light.png) |
+| **每日早报**<br>`60s.早报` | ![早报 深色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/daily-github-dark.png) | ![早报 浅色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/daily-github-light.png) |
+| **实时天气**<br>`60s.天气 上海` | ![天气 深色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/weather-github-dark.png) | ![天气 浅色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/weather-github-light.png) |
+| **微博热搜**<br>`60s.热榜 weibo` | ![热搜 深色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/hot-weibo-github-dark.png) | ![热搜 浅色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/hot-weibo-github-light.png) |
+| **历史上的今天**<br>`60s.历史` | ![历史 深色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/history-github-dark.png) | ![历史 浅色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/history-github-light.png) |
+| **摸鱼日历**<br>`60s.摸鱼` | ![摸鱼 深色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/moyu-github-dark.png) | ![摸鱼 浅色](https://cdn.jsdelivr.net/gh/VincentZyuApps/koishi-plugin-60s-vincentzyu@main/docs/images/preview/moyu-github-light.png) |
 
 ## 📦 安装
 
